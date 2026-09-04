@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import test from "node:test";
-import { pluginRoot, readJson, repoRoot } from "./helpers.mjs";
+import { pluginRoot, readJson, readText, repoRoot } from "./helpers.mjs";
 
 test("plugin.json declares name, version, description, author", () => {
   const manifest = readJson(".claude-plugin/plugin.json");
@@ -52,4 +52,31 @@ test("repo .gitignore excludes local env and node_modules", () => {
   assert.match(ignore, /node_modules/);
   assert.match(ignore, /\.env/);
   assert.ok(existsSync(resolve(repoRoot, ".gitignore")));
+});
+
+test("SKILL.md has frontmatter and references the scripts and reference docs", () => {
+  const skill = readText("skills/linkedin-post/SKILL.md");
+  assert.match(skill, /^---\nname: linkedin-post\ndescription: .+\n---\n/);
+  for (const needle of [
+    "references/style-guide.md",
+    "references/post-types.md",
+    "scripts/publish.mjs",
+    "scripts/auth.mjs",
+    "--dry-run",
+    "LINKEDIN_POST_HOME",
+    "published/",
+    "drafts/",
+    "my-style.md",
+  ]) assert.ok(skill.includes(needle), `SKILL.md missing ${needle}`);
+});
+
+test("SKILL.md forbids publishing without explicit confirmation", () => {
+  const skill = readText("skills/linkedin-post/SKILL.md");
+  assert.match(skill, /Never publish without/i);
+});
+
+test("reference docs exist and define the four post types", () => {
+  const types = readText("skills/linkedin-post/references/post-types.md");
+  for (const key of ["ai-tools", "philosophy", "side-project", "pm-insight"]) assert.ok(types.includes(`## ${key}`));
+  assert.ok(readText("skills/linkedin-post/references/style-guide.md").includes("3000"));
 });
