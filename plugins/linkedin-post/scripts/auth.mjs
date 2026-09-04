@@ -10,14 +10,21 @@ import {
 import { redact } from "./lib/redact.mjs";
 
 const SUCCESS_HTML = "<html><body style='font-family:sans-serif;padding:2rem'><h2>Signed in.</h2><p>You can close this tab and return to the terminal.</p></body></html>";
-const FAILURE_HTML = (msg) => `<html><body style='font-family:sans-serif;padding:2rem'><h2>Sign-in failed</h2><p>${msg}</p></body></html>`;
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const FAILURE_HTML = (msg) => `<html><body style='font-family:sans-serif;padding:2rem'><h2>Sign-in failed</h2><p>${escapeHtml(msg)}</p></body></html>`;
 
-function openBrowser(url) {
-  const cmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "start" : "xdg-open";
+function openBrowser(url, stderr) {
+  const fallback = () => stderr(`Open this URL in your browser:\n${url}`);
+  const [cmd, args, opts] =
+    process.platform === "darwin" ? ["open", [url], {}]
+    : process.platform === "win32" ? ["cmd", ["/c", "start", "", url], {}]
+    : ["xdg-open", [url], {}];
   try {
-    spawn(cmd, [url], { stdio: "ignore", detached: true }).unref();
+    const child = spawn(cmd, args, { ...opts, stdio: "ignore", detached: true });
+    child.on("error", fallback);
+    child.unref();
   } catch {
-    process.stderr.write(`Open this URL in your browser:\n${url}\n`);
+    fallback();
   }
 }
 
@@ -51,7 +58,7 @@ export async function runAuth(deps = {}) {
     const state = generateState();
     const url = buildAuthorizeUrl({ clientId, state });
     stderr("Opening LinkedIn sign-in in your browser...");
-    openBrowser(url);
+    openBrowser(url, stderr);
     const code = await waitForCallback(state);
     const { accessToken, expiresAt } = await exchangeCode({ clientId, clientSecret, code, fetchImpl });
     secrets.push(accessToken);
