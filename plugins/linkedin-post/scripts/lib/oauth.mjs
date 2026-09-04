@@ -1,0 +1,67 @@
+import { randomBytes } from "node:crypto";
+import { redact } from "./redact.mjs";
+
+export const CALLBACK_PORT = 8585;
+export const REDIRECT_URI = `http://localhost:${CALLBACK_PORT}/callback`;
+export const SCOPES = "openid profile w_member_social";
+export const CALLBACK_TIMEOUT_MS = 120_000;
+
+const AUTHORIZE_URL = "https://www.linkedin.com/oauth/v2/authorization";
+const TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken";
+
+export class OAuthError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = "OAuthError";
+    this.code = code;
+  }
+}
+
+export function generateState(randomBytesImpl = randomBytes) {
+  return randomBytesImpl(16).toString("hex");
+}
+
+export function buildAuthorizeUrl({ clientId, state }) {
+  const url = new URL(AUTHORIZE_URL);
+  url.searchParams.set("response_type", "code");
+  url.searchParams.set("client_id", clientId);
+  url.searchParams.set("redirect_uri", REDIRECT_URI);
+  url.searchParams.set("scope", SCOPES);
+  url.searchParams.set("state", state);
+  return url.toString();
+}
+
+export function parseCallback(requestUrl, expectedState) {
+  const url = new URL(requestUrl, "http://localhost");
+  const params = url.searchParams;
+  if (params.get("state") !== expectedState) {
+    throw new OAuthError("STATE_MISMATCH", "OAuth state did not match. Possible CSRF or stale login window.");
+  }
+  if (params.get("error")) {
+    throw new OAuthError("ACCESS_DENIED", `LinkedIn returned error: ${params.get("error")}`);
+  }
+  const code = params.get("code");
+  if (!code) throw new OAuthError("MISSING_CODE", "Callback did not include an authorization code.");
+  return { code };
+}
+
+export async function exchangeCode({ clientId, clientSecret, code, fetchImpl = fetch, now = Date.now }) {
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    code,
+    client_id: clientId,
+    client_secret: clientSecret,
+    redirect_uri: REDIRECT_URI,
+  });
+  const res = await fetchImpl(TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    throw new OAuthError("EXCHANGE_FAILED", `Token exchange failed (${res.status}): ${redact(text, [clientSecret])}`);
+  }
+  const data = JSON.parse(text);
+  return { accessToken: data.access_token, expiresAt: now() + data.expires_in * 1000 };
+}
