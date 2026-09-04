@@ -61,3 +61,13 @@ test("exchangeCode throws EXCHANGE_FAILED on malformed or incomplete 200 body", 
   const incomplete = async () => new Response(JSON.stringify({ expires_in: 10 }), { status: 200 });
   await assert.rejects(exchangeCode({ clientId: "cid", clientSecret: "sec", code: "abc", fetchImpl: incomplete }), (e) => e.code === "EXCHANGE_FAILED");
 });
+
+test("every OAuthError code has a non-empty hint", () => {
+  const codes = [
+    "STATE_MISMATCH", "ACCESS_DENIED", "MISSING_CODE", "EXCHANGE_FAILED", "TIMEOUT", "PORT_IN_USE", "LISTEN_FAILED",
+  ];
+  for (const code of codes) {
+    const hint = new OAuthError(code, "msg").hint;
+    assert.ok(typeof hint === "string" && hint.length > 0, `${code} missing hint`);
+  }
+});

@@ -9,11 +9,22 @@ export const CALLBACK_TIMEOUT_MS = 120_000;
 const AUTHORIZE_URL = "https://www.linkedin.com/oauth/v2/authorization";
 const TOKEN_URL = "https://www.linkedin.com/oauth/v2/accessToken";
 
+const HINTS = {
+  STATE_MISMATCH: "Start sign-in again and use only the window it opens.",
+  ACCESS_DENIED: "You cancelled or LinkedIn denied access. Run auth again and approve the request.",
+  MISSING_CODE: "LinkedIn did not return a code. Check the redirect URL in your developer app is exactly http://localhost:8585/callback.",
+  EXCHANGE_FAILED: "Check client_id and client_secret in config.json, then run auth again.",
+  TIMEOUT: "No sign-in completed within 120 seconds. Run auth again.",
+  PORT_IN_USE: "Close any other sign-in window or free port 8585, then run auth again.",
+  LISTEN_FAILED: "Could not start the local callback server. Check firewall or permissions for port 8585.",
+};
+
 export class OAuthError extends Error {
   constructor(code, message) {
     super(message);
     this.name = "OAuthError";
     this.code = code;
+    this.hint = HINTS[code];
   }
 }
 
