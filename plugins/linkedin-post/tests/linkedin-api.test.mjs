@@ -56,7 +56,7 @@ test("mapStatusToError maps statuses to codes with hints", () => {
   assert.match(mapStatusToError(401, "").hint, /auth\.mjs/);
 });
 
-test("createPost throws LinkedInApiError with body on 4xx and does not retry 5xx", async () => {
+test("createPost throws LinkedInApiError with body on 5xx and does not retry", async () => {
   const { fetchImpl, calls } = fakeFetch([{ status: 500, body: "boom" }]);
   const client = createClient({ accessToken: "tok", fetchImpl });
   await assert.rejects(
@@ -66,14 +66,34 @@ test("createPost throws LinkedInApiError with body on 4xx and does not retry 5xx
   assert.equal(calls.length, 1);
 });
 
-test("network failure retries once after delay, then succeeds", async () => {
-  const { fetchImpl, calls } = fakeFetch([new TypeError("fetch failed"), { status: 201, headers: { "x-restli-id": "id2" } }]);
+test("createPost retries a pre-send network failure (ECONNREFUSED) once, then succeeds", async () => {
+  const preSendError = new TypeError("fetch failed");
+  preSendError.cause = { code: "ECONNREFUSED" };
+  const { fetchImpl, calls } = fakeFetch([preSendError, { status: 201, headers: { "x-restli-id": "id2" } }]);
   const slept = [];
   const client = createClient({ accessToken: "tok", fetchImpl, sleep: async (ms) => slept.push(ms), retryDelayMs: 3000 });
   const result = await client.createPost({ authorUrn: "u", commentary: "c", visibility: "PUBLIC" });
   assert.equal(result.id, "id2");
   assert.equal(calls.length, 2);
   assert.deepEqual(slept, [3000]);
+});
+
+test("createPost does not retry a bare fetch failure with no cause (may have reached the server)", async () => {
+  const { fetchImpl, calls } = fakeFetch([new TypeError("fetch failed")]);
+  const client = createClient({ accessToken: "tok", fetchImpl, sleep: async () => {} });
+  await assert.rejects(
+    client.createPost({ authorUrn: "u", commentary: "c", visibility: "PUBLIC" }),
+    (e) => e instanceof LinkedInApiError && e.code === "NETWORK",
+  );
+  assert.equal(calls.length, 1);
+});
+
+test("getUserInfo still retries a bare fetch failure once", async () => {
+  const { fetchImpl, calls } = fakeFetch([new TypeError("fetch failed"), { status: 200, body: JSON.stringify({ sub: "abc", name: "Tony" }) }]);
+  const client = createClient({ accessToken: "tok", fetchImpl, sleep: async () => {} });
+  const result = await client.getUserInfo();
+  assert.deepEqual(result, { sub: "abc", name: "Tony" });
+  assert.equal(calls.length, 2);
 });
 
 test("network failure twice surfaces NETWORK error", async () => {

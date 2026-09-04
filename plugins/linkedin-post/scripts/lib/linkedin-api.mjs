@@ -8,7 +8,7 @@ const ERROR_TABLE = {
   BAD_REQUEST: "LinkedIn rejected the post body. Check for unescaped reserved characters; the raw response is included.",
   RATE_LIMITED: "Daily posting limit reached. Try again tomorrow; the script will not retry.",
   SERVER_ERROR: "LinkedIn returned a server error. Not retried to avoid duplicate posts. Check your feed before retrying.",
-  NETWORK: "Could not reach api.linkedin.com after one retry. Check your connection.",
+  NETWORK: "Could not reach api.linkedin.com. If this happened while publishing, check your feed before retrying — the post may already exist.",
   UNKNOWN: "Unexpected response from LinkedIn. The raw response is included.",
 };
 
@@ -38,6 +38,16 @@ export function postUrl(id) {
   return `https://www.linkedin.com/feed/update/${id}`;
 }
 
+// Codes that only ever occur before a request left the machine (DNS lookup or
+// TCP connect failures). Any other fetch rejection - including a bare
+// "fetch failed" TypeError with no cause - may mean the request reached the
+// server, so it must not be retried for a non-idempotent POST.
+const PRE_SEND_CODES = new Set(["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED", "UND_ERR_CONNECT_TIMEOUT"]);
+
+export const isPreSendError = (error) => PRE_SEND_CODES.has(error?.cause?.code ?? error?.code);
+
+const alwaysRetry = () => true;
+
 const defaultSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSleep, retryDelayMs = 3000 }) {
@@ -47,21 +57,26 @@ export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSl
     "X-Restli-Protocol-Version": "2.0.0",
   };
 
-  async function request(url, init) {
+  async function request(url, init, { retryOn }) {
     try {
       return await fetchImpl(url, init);
     } catch (first) {
+      if (!retryOn(first)) {
+        throw new LinkedInApiError("NETWORK", 0, String(first?.message ?? first));
+      }
       await sleep(retryDelayMs);
       try {
         return await fetchImpl(url, init);
       } catch (second) {
-        throw new LinkedInApiError("NETWORK", 0, String(second?.message ?? second));
+        const error = new LinkedInApiError("NETWORK", 0, String(second?.message ?? second));
+        error.cause = first;
+        throw error;
       }
     }
   }
 
   async function getUserInfo() {
-    const res = await request(USERINFO_URL, { method: "GET", headers: baseHeaders });
+    const res = await request(USERINFO_URL, { method: "GET", headers: baseHeaders }, { retryOn: alwaysRetry });
     if (!res.ok) throw mapStatusToError(res.status, await res.text());
     const data = await res.json();
     return { sub: data.sub, name: data.name };
@@ -76,11 +91,15 @@ export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSl
       lifecycleState: "PUBLISHED",
       isReshareDisabledByAuthor: false,
     };
-    const res = await request(POSTS_URL, {
-      method: "POST",
-      headers: { ...baseHeaders, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
+    const res = await request(
+      POSTS_URL,
+      {
+        method: "POST",
+        headers: { ...baseHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      },
+      { retryOn: isPreSendError },
+    );
     if (!res.ok) throw mapStatusToError(res.status, await res.text());
     const id = res.headers.get("x-restli-id");
     if (!id) throw new LinkedInApiError("UNKNOWN", res.status, "", "Post created but x-restli-id header missing");
