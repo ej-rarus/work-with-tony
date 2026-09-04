@@ -55,8 +55,8 @@ test("repo .gitignore excludes local env and node_modules", () => {
 });
 
 test("SKILL.md has frontmatter and references the scripts and reference docs", () => {
-  const skill = readText("skills/linkedin-post/SKILL.md");
-  assert.match(skill, /^---\nname: linkedin-post\ndescription: .+\n---\n/);
+  const skill = readText("skills/post/SKILL.md");
+  assert.match(skill, /^---\nname: post\ndescription: .+\n---\n/);
   for (const needle of [
     "references/style-guide.md",
     "references/post-types.md",
@@ -71,12 +71,18 @@ test("SKILL.md has frontmatter and references the scripts and reference docs", (
 });
 
 test("SKILL.md forbids publishing without explicit confirmation", () => {
-  const skill = readText("skills/linkedin-post/SKILL.md");
+  const skill = readText("skills/post/SKILL.md");
   assert.match(skill, /Never publish without/i);
 });
 
+test("SKILL.md uses CLAUDE_PLUGIN_ROOT and the installed invocation form", () => {
+  const skill = readText("skills/post/SKILL.md");
+  assert.ok(skill.includes("CLAUDE_PLUGIN_ROOT"), "SKILL.md missing CLAUDE_PLUGIN_ROOT");
+  assert.ok(skill.includes("/linkedin-post:post"), "SKILL.md missing /linkedin-post:post");
+});
+
 test("reference docs exist and define the four post types", () => {
-  const types = readText("skills/linkedin-post/references/post-types.md");
+  const types = readText("skills/post/references/post-types.md");
   for (const key of ["ai-tools", "philosophy", "side-project", "pm-insight"]) assert.ok(types.includes(`## ${key}`));
-  assert.ok(readText("skills/linkedin-post/references/style-guide.md").includes("3000"));
+  assert.ok(readText("skills/post/references/style-guide.md").includes("3000"));
 });
