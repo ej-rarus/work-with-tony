@@ -54,3 +54,10 @@ test("exchangeCode throws EXCHANGE_FAILED on non-200 without leaking the secret"
     (e) => e.code === "EXCHANGE_FAILED" && !e.message.includes("sec"),
   );
 });
+
+test("exchangeCode throws EXCHANGE_FAILED on malformed or incomplete 200 body", async () => {
+  const bad = async () => new Response("not json", { status: 200 });
+  await assert.rejects(exchangeCode({ clientId: "cid", clientSecret: "sec", code: "abc", fetchImpl: bad }), (e) => e.code === "EXCHANGE_FAILED");
+  const incomplete = async () => new Response(JSON.stringify({ expires_in: 10 }), { status: 200 });
+  await assert.rejects(exchangeCode({ clientId: "cid", clientSecret: "sec", code: "abc", fetchImpl: incomplete }), (e) => e.code === "EXCHANGE_FAILED");
+});

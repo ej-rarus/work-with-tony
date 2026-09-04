@@ -62,6 +62,14 @@ export async function exchangeCode({ clientId, clientSecret, code, fetchImpl = f
   if (!res.ok) {
     throw new OAuthError("EXCHANGE_FAILED", `Token exchange failed (${res.status}): ${redact(text, [clientSecret])}`);
   }
-  const data = JSON.parse(text);
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new OAuthError("EXCHANGE_FAILED", "Token response was not valid JSON.");
+  }
+  if (typeof data.access_token !== "string" || typeof data.expires_in !== "number") {
+    throw new OAuthError("EXCHANGE_FAILED", "Token response missing access_token or expires_in.");
+  }
   return { accessToken: data.access_token, expiresAt: now() + data.expires_in * 1000 };
 }
