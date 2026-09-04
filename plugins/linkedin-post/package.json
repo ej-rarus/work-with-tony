@@ -1,0 +1,12 @@
+{
+  "name": "linkedin-post-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "auth": "node scripts/auth.mjs",
+    "publish:post": "node scripts/publish.mjs"
+  }
+}
