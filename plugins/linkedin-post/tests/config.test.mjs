@@ -78,6 +78,16 @@ test("loadToken throws MISSING_TOKEN and INVALID_TOKEN", () => {
   } finally { cleanup(); }
 });
 
+test("loadToken throws INVALID_TOKEN when expiresAt is not a number", () => {
+  const { home, cleanup } = makeTempHome();
+  try {
+    writeFileSync(join(home, "token.json"), JSON.stringify({
+      accessToken: "x", expiresAt: "not-a-number", personUrn: "urn:li:person:abc", name: "Tony",
+    }));
+    assert.throws(() => loadToken(home), (e) => e.code === "INVALID_TOKEN");
+  } finally { cleanup(); }
+});
+
 test("tokenStatus distinguishes valid, expiring, expired", () => {
   const now = 1_000_000_000_000;
   assert.equal(tokenStatus({ expiresAt: now + EXPIRING_WINDOW_MS + 1 }, now), "valid");

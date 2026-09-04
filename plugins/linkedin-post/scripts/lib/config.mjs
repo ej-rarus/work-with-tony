@@ -67,6 +67,7 @@ export function loadToken(home) {
   const raw = readJsonFile(getPaths(home).token, "MISSING_TOKEN", "INVALID_TOKEN");
   const missing = TOKEN_FIELDS.filter((k) => raw[k] === undefined || raw[k] === null);
   if (missing.length) throw new ConfigError("INVALID_TOKEN", `token.json missing: ${missing.join(", ")}`);
+  if (typeof raw.expiresAt !== "number") throw new ConfigError("INVALID_TOKEN", "token.json expiresAt must be a number");
   return Object.fromEntries(TOKEN_FIELDS.map((k) => [k, raw[k]]));
 }
 

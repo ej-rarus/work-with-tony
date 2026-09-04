@@ -12,6 +12,18 @@ test("does not double-escape characters that are already escaped", () => {
   assert.equal(escapeCommentary(String.raw`\(already\) (not)`), String.raw`\(already\) \(not\)`);
 });
 
+test("a doubled backslash is passed through as-is, then the next char is escaped fresh", () => {
+  // Input: two literal backslashes followed by "(" (3 chars).
+  // The first backslash sees the second backslash as its lookahead - a
+  // reserved char - so the pair is treated as "already escaped" and copied
+  // through unchanged (2 chars: \\). The loop then moves past both, leaving
+  // the "(" to be evaluated on its own and escaped normally (\().
+  // Result: 2 + 2 = 4 chars: three backslashes followed by "(".
+  const input = "\\\\(";
+  const expected = "\\\\\\(";
+  assert.equal(escapeCommentary(input), expected);
+});
+
 test("preserves Korean, emoji and line breaks", () => {
   const input = "첫 줄입니다.\n\n둘째 줄 🚀 끝";
   assert.equal(escapeCommentary(input), input);

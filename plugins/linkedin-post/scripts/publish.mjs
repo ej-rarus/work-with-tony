@@ -1,4 +1,10 @@
 #!/usr/bin/env node
+const MIN_NODE_MAJOR = 20;
+if (Number(process.versions.node.split(".")[0]) < MIN_NODE_MAJOR) {
+  process.stdout.write(`${JSON.stringify({ ok: false, code: "NODE_TOO_OLD", message: `Node ${process.versions.node} detected.`, hint: `This plugin needs Node ${MIN_NODE_MAJOR} or newer.` })}\n`);
+  process.exit(2);
+}
+
 import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { ConfigError, getHome, loadToken, tokenStatus } from "./lib/config.mjs";
@@ -86,7 +92,7 @@ function failure(error, secrets) {
 export async function runPublish(argv, deps = {}) {
   const {
     env = process.env,
-    fetchImpl = fetch,
+    fetchImpl = globalThis.fetch,
     now = Date.now,
     sleep,
     stdout = (line) => process.stdout.write(`${line}\n`),
@@ -103,7 +109,8 @@ export async function runPublish(argv, deps = {}) {
     const chars = countChars(body);
 
     if (args.dryRun) {
-      stdout(JSON.stringify({ ok: true, dryRun: true, request, chars }));
+      const escapedChars = countChars(commentary);
+      stdout(JSON.stringify({ ok: true, dryRun: true, request, chars, escapedChars }));
       return 0;
     }
 
@@ -120,5 +127,10 @@ export async function runPublish(argv, deps = {}) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  runPublish(process.argv.slice(2)).then((code) => process.exit(code));
+  runPublish(process.argv.slice(2))
+    .then((code) => process.exit(code))
+    .catch((e) => {
+      process.stdout.write(`${JSON.stringify({ ok: false, code: "UNKNOWN", message: String(e?.message ?? e), hint: "" })}\n`);
+      process.exit(1);
+    });
 }

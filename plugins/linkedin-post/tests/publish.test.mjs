@@ -39,6 +39,12 @@ test("validateBody rejects empty and over-long text", () => {
   assert.equal(validateBody("  hi  "), "hi");
 });
 
+test("validateBody accepts exactly the 3000-character boundary", () => {
+  const body = "가".repeat(3000);
+  assert.equal(validateBody(body), body);
+  assert.equal(validateBody(body).length, 3000);
+});
+
 test("missing file exits 2 with FILE_NOT_FOUND", async () => {
   const s = setup();
   try {
@@ -80,6 +86,7 @@ test("dry-run prints escaped request without calling fetch", async () => {
     assert.equal(json.request.commentary, "안녕하세요 \\(테스트\\)");
     assert.equal(json.request.author, "urn:li:person:abc");
     assert.equal(json.chars, 11);
+    assert.equal(json.escapedChars, 13);
   } finally { s.cleanup(); }
 });
 
