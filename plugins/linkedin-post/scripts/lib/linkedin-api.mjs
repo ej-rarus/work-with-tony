@@ -1,4 +1,4 @@
-export const API_VERSION = "202508";
+export const API_VERSION = "202509";
 export const POSTS_URL = "https://api.linkedin.com/rest/posts";
 export const USERINFO_URL = "https://api.linkedin.com/v2/userinfo";
 
@@ -9,6 +9,7 @@ const ERROR_TABLE = {
   RATE_LIMITED: "Daily posting limit reached. Try again tomorrow; the script will not retry.",
   SERVER_ERROR: "LinkedIn returned a server error. Not retried to avoid duplicate posts. Check your feed before retrying.",
   NETWORK: "Could not reach api.linkedin.com. If this happened while publishing, check your feed before retrying — the post may already exist.",
+  API_VERSION_INACTIVE: "LinkedIn no longer serves this API version. Update API_VERSION in scripts/lib/linkedin-api.mjs to a currently active YYYYMM value.",
   UNKNOWN: "Unexpected response from LinkedIn. The raw response is included.",
 };
 
@@ -28,6 +29,7 @@ export function mapStatusToError(status, body) {
     status === 401 ? "UNAUTHORIZED"
     : status === 403 ? "FORBIDDEN"
     : status === 400 || status === 422 ? "BAD_REQUEST"
+    : status === 426 ? "API_VERSION_INACTIVE"
     : status === 429 ? "RATE_LIMITED"
     : status >= 500 ? "SERVER_ERROR"
     : "UNKNOWN";

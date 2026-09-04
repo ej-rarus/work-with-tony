@@ -49,6 +49,7 @@ test("mapStatusToError maps statuses to codes with hints", () => {
   assert.equal(mapStatusToError(403, "").code, "FORBIDDEN");
   assert.equal(mapStatusToError(400, "").code, "BAD_REQUEST");
   assert.equal(mapStatusToError(422, "").code, "BAD_REQUEST");
+  assert.equal(mapStatusToError(426, "").code, "API_VERSION_INACTIVE");
   assert.equal(mapStatusToError(429, "").code, "RATE_LIMITED");
   assert.equal(mapStatusToError(503, "").code, "SERVER_ERROR");
   assert.equal(mapStatusToError(418, "").code, "UNKNOWN");
