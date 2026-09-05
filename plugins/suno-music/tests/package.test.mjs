@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import test from "node:test";
-import { pluginRoot, readJson, repoRoot } from "./helpers.mjs";
+import { pluginRoot, readJson, readText, repoRoot } from "./helpers.mjs";
 
 test("Codex manifest declares the Suno prepare skill", () => {
   const manifest = readJson(".codex-plugin/plugin.json");
@@ -35,4 +35,40 @@ test("package has no executable integration or runtime dependency", () => {
   assert.equal(pkg.dependencies, undefined);
   assert.equal(existsSync(resolve(pluginRoot, ".mcp.json")), false);
   assert.equal(existsSync(resolve(pluginRoot, ".claude-plugin")), false);
+});
+
+test("prepare skill defines the semantic Suno form workflow", () => {
+  const skill = readText("skills/prepare/SKILL.md");
+  assert.match(skill, /^---\nname: prepare\ndescription: .+\n---\n/);
+  for (const required of [
+    "https://suno.com/create",
+    "Advanced",
+    "Lyrics editor",
+    "Styles",
+    "Song Title (Optional)",
+    "Male",
+    "Female",
+    "5,000",
+    "1,000",
+  ]) assert.ok(skill.includes(required), `prepare skill missing ${required}`);
+});
+
+test("prepare skill preserves user text and forbids credit-spending actions", () => {
+  const skill = readText("skills/prepare/SKILL.md");
+  assert.match(skill, /preserve.*exactly/i);
+  assert.match(skill, /Never click, press, or otherwise invoke `Create song`/);
+  assert.match(skill, /existing form.*confirmation/i);
+  assert.match(skill, /fresh browser state/i);
+  assert.match(skill, /fixed coordinates/i);
+  assert.doesNotMatch(skill, /click\([^\n]*Create song/i);
+});
+
+test("documentation describes prepare-only scope and Codex installation", () => {
+  const pluginReadme = readText("README.md");
+  const rootReadme = readText("README.md", repoRoot);
+  assert.ok(pluginReadme.includes("$suno-music:prepare"));
+  assert.ok(pluginReadme.includes("Create song"));
+  assert.ok(pluginReadme.includes("does not"));
+  assert.ok(rootReadme.includes("codex plugin marketplace add ej-rarus/work-with-tony"));
+  assert.ok(rootReadme.includes("suno-music@work-with-tony"));
 });
