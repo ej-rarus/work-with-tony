@@ -1,0 +1,23 @@
+{
+  "name": "suno-music",
+  "version": "0.1.0",
+  "description": "Prepare Suno Advanced song forms from approved lyrics and style without spending credits.",
+  "author": { "name": "Tony (Eunjae Lee)" },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["suno", "music", "lyrics", "browser", "creative"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Suno Music",
+    "shortDescription": "Prepare a Suno song form for review",
+    "longDescription": "Fill Suno's Advanced form with approved title, lyrics, style, and options, verify the result, and stop before credit-spending creation.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Creative",
+    "capabilities": ["Interactive", "Browser"],
+    "defaultPrompt": [
+      "$suno-music:prepare 이 가사와 스타일을 Suno에 입력해줘",
+      "확정한 제목, 가사, 스타일로 Suno 입력 화면을 준비해줘"
+    ]
+  }
+}
