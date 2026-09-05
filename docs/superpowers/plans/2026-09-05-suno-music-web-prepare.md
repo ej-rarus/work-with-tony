@@ -407,15 +407,22 @@ rg -n "SUNO_API_KEY|api[_-]?key|session[_-]?token|\.mcp\.json|Create song.*click
 
 Expected: the file list contains only the Codex manifest, skill, README, package metadata, and tests. Search output may contain tests and explicit prohibition prose, but no credential handling, MCP config, or instruction to click `Create song`.
 
-- [ ] **Step 4: Install the repository marketplace and plugin locally**
+- [ ] **Step 4: Refresh the repository marketplace and install the plugin locally**
 
-Run `codex plugin marketplace list`. If `work-with-tony` is absent, run:
+Run `codex plugin marketplace list`. If `work-with-tony` is absent, add the local repository:
 
 ```bash
 codex plugin marketplace add /Users/lukukutony/Documents/work-with-tony
 ```
 
-Then run:
+If `work-with-tony` is already registered as a Git marketplace, first publish the completed commits and refresh its snapshot:
+
+```bash
+git push origin main
+codex plugin marketplace upgrade work-with-tony --json
+```
+
+Then install and inspect the catalog:
 
 ```bash
 codex plugin add suno-music@work-with-tony
@@ -440,7 +447,7 @@ If validation required changes, stage only `suno-music`, `.agents/plugins/market
 git commit -m "fix(suno-music): address validation findings"
 ```
 
-- [ ] **Step 6: Push the completed implementation**
+- [ ] **Step 6: Push any final validation fix and verify synchronization**
 
 Run:
 
