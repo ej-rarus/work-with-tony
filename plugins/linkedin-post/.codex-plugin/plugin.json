@@ -1,0 +1,20 @@
+{
+  "name": "linkedin-post",
+  "version": "0.1.0",
+  "description": "Draft LinkedIn posts in conversation and publish them to your personal profile through the official LinkedIn API.",
+  "author": { "name": "Tony (Eunjae Lee)" },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["linkedin", "writing", "social", "publishing"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "LinkedIn Post",
+    "shortDescription": "Draft and publish LinkedIn posts",
+    "longDescription": "Turn a topic line or a notes file into a LinkedIn post, refine it in conversation, and publish to your personal profile only after you explicitly confirm.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": ["$linkedin-post:post 이번 주 배운 점", "$linkedin-post:post ~/notes/retro.md"]
+  }
+}

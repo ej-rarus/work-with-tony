@@ -1,22 +1,22 @@
 ---
 name: post
-description: Draft a LinkedIn post from a one-line topic or a source file, refine it in conversation, and publish it to the user's personal LinkedIn profile through the official API once they explicitly confirm. Use when the user types /linkedin-post:post, asks to write or publish a LinkedIn post, or wants to turn notes, a blog post, or a retro into a LinkedIn update.
+description: Draft a LinkedIn post from a one-line topic or a source file, refine it in conversation, and publish it to the user's personal LinkedIn profile through the official API once they explicitly confirm. Use when the user types /linkedin-post:post (Claude Code) or $linkedin-post:post (Codex), asks to write or publish a LinkedIn post, or wants to turn notes, a blog post, or a retro into a LinkedIn update.
 ---
 
 # LinkedIn Post
 
 Write the post; let the scripts talk to LinkedIn. You never call the LinkedIn API yourself and never print tokens or secrets.
 
-This skill also triggers on natural-language requests like "write a LinkedIn post about ..." or "post this to LinkedIn" — not only the explicit `/linkedin-post:post` command.
+This skill also triggers on natural-language requests like "write a LinkedIn post about ..." or "post this to LinkedIn" — not only the explicit command (`/linkedin-post:post` in Claude Code, `$linkedin-post:post` in Codex).
 
-Run every script with the `CLAUDE_PLUGIN_ROOT` environment variable, which Claude Code sets to this plugin's root when the skill loads:
+Run every script from this plugin's root. In Claude Code the `CLAUDE_PLUGIN_ROOT` environment variable points there when the skill loads:
 
 ```
 node "${CLAUDE_PLUGIN_ROOT}/scripts/publish.mjs" "<draft path>"
 node "${CLAUDE_PLUGIN_ROOT}/scripts/auth.mjs"
 ```
 
-If `CLAUDE_PLUGIN_ROOT` is unset, the plugin root is two directories above the base directory announced when this skill loaded.
+If `CLAUDE_PLUGIN_ROOT` is unset (Codex, or any host that does not set it), substitute the plugin root yourself: it is two directories above the base directory announced when this skill loaded (`.../skills/post` → `...`). Use that absolute path in place of `${CLAUDE_PLUGIN_ROOT}` in every command below.
 
 ## Personal data location
 
@@ -52,7 +52,7 @@ Read, in this order:
 4. The 5 most recent files in `published/`.
 
 Parse the invocation:
-- `/linkedin-post:post <text>` – if `<text>` is an existing file path, read it as source material; otherwise treat it as the topic.
+- `/linkedin-post:post <text>` (Codex: `$linkedin-post:post <text>`) – if `<text>` is an existing file path, read it as source material; otherwise treat it as the topic.
 - `--en` anywhere in the arguments → write in English. Default is Korean, polite form.
 - `--visibility connections` → pass through to publish. Default public.
 - No arguments → ask one question: "What is the post about? A topic line or a file path works."
