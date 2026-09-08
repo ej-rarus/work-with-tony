@@ -1,0 +1,9 @@
+{
+  "name": "suno-music",
+  "version": "0.1.0",
+  "description": "Prepare Suno Advanced song forms from approved lyrics and style without spending credits.",
+  "author": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["suno", "music", "lyrics", "browser", "creative"]
+}

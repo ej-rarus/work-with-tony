@@ -1,6 +1,6 @@
 ---
 name: prepare
-description: Fill Suno's Advanced creation form with user-approved title, lyrics, style, and optional settings, verify the populated values, and stop before generation. Use when the user types $suno-music:prepare or asks to put lyrics and style into Suno.
+description: Fill Suno's Advanced creation form with user-approved title, lyrics, style, and optional settings, verify the populated values, and stop before generation. Use when the user types /suno-music:prepare in Claude Code, $suno-music:prepare in Codex, or asks to put lyrics and style into Suno.
 ---
 
 # Suno Music Prepare
