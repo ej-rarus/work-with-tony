@@ -7,7 +7,7 @@ import { pluginRoot, readJson, readText, repoRoot } from "./helpers.mjs";
 test("Codex manifest declares the Suno prepare skill", () => {
   const manifest = readJson(".codex-plugin/plugin.json");
   assert.equal(manifest.name, "suno-music");
-  assert.equal(manifest.version, "0.1.0");
+  assert.equal(manifest.version, readJson("package.json").version);
   assert.equal(manifest.author.name, "Tony (Eunjae Lee)");
   assert.equal(manifest.skills, "./skills/");
   assert.equal(manifest.interface.displayName, "Suno Music");
@@ -19,7 +19,8 @@ test("Codex manifest declares the Suno prepare skill", () => {
 test("Claude manifest declares the Suno prepare plugin", () => {
   const manifest = readJson(".claude-plugin/plugin.json");
   assert.equal(manifest.name, "suno-music");
-  assert.equal(manifest.version, "0.1.0");
+  assert.equal(manifest.version, readJson("package.json").version);
+  assert.equal(manifest.version, readJson(".codex-plugin/plugin.json").version);
   assert.equal(manifest.author.name, "Tony (Eunjae Lee)");
 });
 
@@ -27,7 +28,9 @@ test("repository marketplace lists existing and new plugins", () => {
   const marketplace = readJson(".agents/plugins/marketplace.json", repoRoot);
   assert.equal(marketplace.name, "work-with-tony");
   assert.equal(marketplace.interface.displayName, "Work With Tony");
-  assert.deepEqual(marketplace.plugins.map((entry) => entry.name), ["linkedin-post", "suno-music"]);
+  const names = marketplace.plugins.map((entry) => entry.name);
+  for (const name of ["linkedin-post", "suno-music"]) assert.ok(names.includes(name), `${name} entry missing`);
+  assert.equal(new Set(names).size, names.length, "duplicate marketplace plugin name");
   const suno = marketplace.plugins.find((entry) => entry.name === "suno-music");
   assert.equal(suno.source.path, "./plugins/suno-music");
   assert.deepEqual(suno.policy, { installation: "AVAILABLE", authentication: "ON_INSTALL" });
@@ -36,7 +39,9 @@ test("repository marketplace lists existing and new plugins", () => {
 
 test("Claude marketplace lists both plugins with the Suno manifest version", () => {
   const marketplace = readJson(".claude-plugin/marketplace.json", repoRoot);
-  assert.deepEqual(marketplace.plugins.map((entry) => entry.name), ["linkedin-post", "suno-music"]);
+  const names = marketplace.plugins.map((entry) => entry.name);
+  for (const name of ["linkedin-post", "suno-music"]) assert.ok(names.includes(name), `${name} entry missing`);
+  assert.equal(new Set(names).size, names.length, "duplicate marketplace plugin name");
   const suno = marketplace.plugins.find((entry) => entry.name === "suno-music");
   assert.equal(suno.source, "./plugins/suno-music");
   assert.equal(suno.version, readJson(".claude-plugin/plugin.json").version);

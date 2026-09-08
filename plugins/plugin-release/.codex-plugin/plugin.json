@@ -1,0 +1,25 @@
+{
+  "name": "plugin-release",
+  "version": "0.1.0",
+  "description": "Validate Claude Code and Codex plugins, synchronize local marketplace metadata, and guide a verified Git release.",
+  "author": {
+    "name": "Tony (Eunjae Lee)"
+  },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["plugins", "release", "marketplace", "claude", "codex"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Plugin Release",
+    "shortDescription": "Validate and release Claude and Codex plugins",
+    "longDescription": "Check plugin packages and tests, preview or apply marketplace and version updates, and complete authorized Git releases with remote verification.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "$plugin-release:release 이 레포의 플러그인들을 검증해줘",
+      "$plugin-release:release suno-music을 다음 버전으로 준비하고 변경 내용을 보여줘"
+    ]
+  }
+}

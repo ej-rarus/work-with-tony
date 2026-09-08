@@ -1,18 +1,44 @@
 {
   "name": "work-with-tony",
-  "interface": { "displayName": "Work With Tony" },
+  "interface": {
+    "displayName": "Work With Tony"
+  },
   "plugins": [
     {
       "name": "linkedin-post",
-      "source": { "source": "local", "path": "./plugins/linkedin-post" },
-      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "source": {
+        "source": "local",
+        "path": "./plugins/linkedin-post"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
       "category": "Productivity"
     },
     {
       "name": "suno-music",
-      "source": { "source": "local", "path": "./plugins/suno-music" },
-      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "source": {
+        "source": "local",
+        "path": "./plugins/suno-music"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
       "category": "Creative"
+    },
+    {
+      "name": "plugin-release",
+      "source": {
+        "source": "local",
+        "path": "./plugins/plugin-release"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
     }
   ]
 }

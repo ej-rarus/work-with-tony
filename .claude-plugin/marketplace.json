@@ -16,6 +16,13 @@
       "version": "0.1.0",
       "source": "./plugins/suno-music",
       "author": { "name": "Tony (Eunjae Lee)" }
+    },
+    {
+      "name": "plugin-release",
+      "description": "Validate Claude Code and Codex plugins, synchronize local marketplace metadata, and guide a verified Git release.",
+      "version": "0.1.0",
+      "source": "./plugins/plugin-release",
+      "author": { "name": "Tony (Eunjae Lee)" }
     }
   ]
 }

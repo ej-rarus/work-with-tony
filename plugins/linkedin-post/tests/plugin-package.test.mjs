@@ -7,7 +7,8 @@ import { pluginRoot, readJson, readText, repoRoot } from "./helpers.mjs";
 test("plugin.json declares name, version, description, author", () => {
   const manifest = readJson(".claude-plugin/plugin.json");
   assert.equal(manifest.name, "linkedin-post");
-  assert.equal(manifest.version, "0.1.0");
+  assert.equal(manifest.version, readJson("package.json").version);
+  assert.equal(manifest.version, readJson(".codex-plugin/plugin.json").version);
   assert.ok(manifest.description.length > 20);
   assert.equal(manifest.author.name, "Tony (Eunjae Lee)");
 });
@@ -16,6 +17,8 @@ test("marketplace.json lists linkedin-post with matching version", () => {
   const market = readJson(".claude-plugin/marketplace.json", repoRoot);
   assert.equal(market.name, "work-with-tony");
   const entry = market.plugins.find((p) => p.name === "linkedin-post");
+  const names = market.plugins.map((p) => p.name);
+  assert.equal(new Set(names).size, names.length, "duplicate marketplace plugin name");
   assert.ok(entry, "linkedin-post entry missing");
   assert.equal(entry.source, "./plugins/linkedin-post");
   assert.equal(entry.version, readJson(".claude-plugin/plugin.json").version);
