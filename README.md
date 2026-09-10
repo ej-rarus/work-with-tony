@@ -21,3 +21,9 @@ codex plugin marketplace add ej-rarus/work-with-tony
 | [plugin-release](plugins/plugin-release/) | Validate plugin packages, sync marketplace metadata, and complete authorized Git releases with remote verification | Claude: `/plugin install plugin-release@work-with-tony`<br>Codex: `codex plugin add plugin-release@work-with-tony` |
 
 Each plugin lives under `plugins/<name>/` with its own README, tests and manifest.
+
+## Tony Workmate
+
+[tony-workmate](plugins/tony-workmate/) bundles seven everyday workflows: actionable requests, format-preserving document revisions, meeting follow-ups, Apple Calendar entries, verified delivery, expense claims, and pending-request tracking. It reuses available integrations and checks sender identity and actual completion.
+
+Install with `/plugin install tony-workmate@work-with-tony` in Claude Code or `codex plugin add tony-workmate@work-with-tony` in Codex. Start a new task after installation to load the skills.

@@ -1,0 +1,26 @@
+{
+  "name": "tony-workmate",
+  "version": "0.1.0",
+  "description": "Turn requests into actionable handoffs, preserve document formats, and finish meetings, calendar entries, deliveries, expense claims, and follow-ups.",
+  "author": {
+    "name": "Tony (Eunjae Lee)"
+  },
+  "skills": "./skills/",
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["productivity", "handoff", "documents", "meetings", "calendar", "expenses"],
+  "interface": {
+    "displayName": "Tony Workmate",
+    "shortDescription": "요청부터 문서·일정·전달까지 마무리하는 업무 파트너",
+    "longDescription": "Seven focused skills for actionable requests, format-preserving document revisions, meeting follow-ups, Apple Calendar entries, verified delivery, expense claims, and pending-request tracking. Uses existing authorized integrations without adding background collection.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": [
+      "$tony-workmate:request-to-action 이 고객 요청을 담당자 확인 요청으로 정리해줘",
+      "$tony-workmate:document-revise 기존 양식을 유지해서 이 문서를 수정해줘",
+      "$tony-workmate:expense-claim 이 영수증들을 비용 청구용으로 정리해줘"
+    ]
+  }
+}

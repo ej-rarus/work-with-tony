@@ -1,0 +1,9 @@
+{
+  "name": "tony-workmate",
+  "version": "0.1.0",
+  "description": "Turn requests into actionable handoffs, preserve document formats, and finish meetings, calendar entries, deliveries, expense claims, and follow-ups.",
+  "author": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["productivity", "handoff", "documents", "meetings", "calendar", "expenses"]
+}

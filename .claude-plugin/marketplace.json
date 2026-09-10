@@ -1,28 +1,47 @@
 {
   "name": "work-with-tony",
   "description": "Tony's personal toolkit of Claude Code plugins",
-  "owner": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "owner": {
+    "name": "Tony (Eunjae Lee)",
+    "url": "https://github.com/ej-rarus"
+  },
   "plugins": [
     {
       "name": "linkedin-post",
       "description": "Draft LinkedIn posts in conversation and publish them to your personal profile through the official LinkedIn API.",
       "version": "0.2.0",
       "source": "./plugins/linkedin-post",
-      "author": { "name": "Tony (Eunjae Lee)" }
+      "author": {
+        "name": "Tony (Eunjae Lee)"
+      }
     },
     {
       "name": "suno-music",
       "description": "Prepare Suno Advanced song forms from approved lyrics and style without spending credits.",
       "version": "0.1.0",
       "source": "./plugins/suno-music",
-      "author": { "name": "Tony (Eunjae Lee)" }
+      "author": {
+        "name": "Tony (Eunjae Lee)"
+      }
     },
     {
       "name": "plugin-release",
       "description": "Validate Claude Code and Codex plugins, synchronize local marketplace metadata, and guide a verified Git release.",
       "version": "0.1.0",
       "source": "./plugins/plugin-release",
-      "author": { "name": "Tony (Eunjae Lee)" }
+      "author": {
+        "name": "Tony (Eunjae Lee)"
+      }
+    },
+    {
+      "name": "tony-workmate",
+      "description": "Turn requests into actionable handoffs, preserve document formats, and finish meetings, calendar entries, deliveries, expense claims, and follow-ups.",
+      "version": "0.1.0",
+      "source": "./plugins/tony-workmate",
+      "author": {
+        "name": "Tony (Eunjae Lee)",
+        "url": "https://github.com/ej-rarus"
+      }
     }
   ]
 }
