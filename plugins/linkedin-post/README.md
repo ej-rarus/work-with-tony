@@ -50,6 +50,23 @@ You can also just ask in conversation — "write a LinkedIn post about ..." or "
 
 The skill drafts, shows character count and the two-line preview, iterates with you, and publishes only when you say so (for example "올려" or "publish").
 
+Each draft also picks one of six post structures (`scene`, `rules`, `questions`, `contrarian`, `compare`, `short`) and avoids the structures used by your three most recent posts, so a daily habit does not turn into the same arc every day. See `skills/post/references/structures.md`; drop a `structures.md` into `~/.linkedin-post/` to replace it with your own.
+
+### Recording reactions
+
+LinkedIn does not let a personal developer app read likes or comments, so you paste them:
+
+```
+반응 기록: 좋아요 23, 댓글 4
+(댓글 본문을 그대로 붙여넣기)
+```
+
+The skill writes a `stats:` block into the post's file under `published/` and appends the comments under `## Reactions (date)`. Later drafts read those reactions as material, and a comment with a question or a disagreement becomes a suggested follow-up topic.
+
+### Series
+
+Add `series: <slug>` when publishing a post that continues an earlier one. The next time a topic fits that series, the skill reads every post in it before drafting so the reference back is deliberate.
+
 ## Files it keeps
 
 All under `~/.linkedin-post/` (override with `LINKEDIN_POST_HOME`):
@@ -60,8 +77,9 @@ All under `~/.linkedin-post/` (override with `LINKEDIN_POST_HOME`):
 | `token.json` | Access token, mode 0600 |
 | `references/` | Example posts you like |
 | `drafts/` | Confirmed body awaiting publish |
-| `published/` | Copy of each published post with date, URL, type |
+| `published/` | Copy of each published post with date, URL, type, structure, optional series and stats |
 | `my-style.md` | Your own style rules, appended only when you ask |
+| `structures.md` | Optional; replaces the skill's built-in structure catalog |
 
 Nothing personal is stored inside the plugin directory.
 
@@ -71,9 +89,10 @@ Nothing personal is stored inside the plugin directory.
 node scripts/auth.mjs                       # browser sign-in, saves token.json
 node scripts/publish.mjs body.md            # publish, prints one JSON line
 node scripts/publish.mjs body.md --dry-run  # show escaped request, no API call
+node scripts/record.mjs published/2026-09-10-post.md --likes 23 --comments 4 --reactions-file comments.md
 ```
 
-Exit codes: 0 success, 1 LinkedIn API error, 2 configuration or validation error.
+Exit codes for `auth.mjs` and `publish.mjs`: 0 success, 1 LinkedIn API error, 2 configuration or validation error. For `record.mjs` (no API call): 0 success, 1 usage error, 2 file or frontmatter problem.
 
 ## Out of scope (for now)
 

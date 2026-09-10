@@ -63,8 +63,13 @@ test("SKILL.md has frontmatter and references the scripts and reference docs", (
   for (const needle of [
     "references/style-guide.md",
     "references/post-types.md",
+    "references/structures.md",
     "scripts/publish.mjs",
     "scripts/auth.mjs",
+    "scripts/record.mjs",
+    "structure:",
+    "series:",
+    "## Reactions",
     "--dry-run",
     "LINKEDIN_POST_HOME",
     "published/",
@@ -88,4 +93,20 @@ test("reference docs exist and define the four post types", () => {
   const types = readText("skills/post/references/post-types.md");
   for (const key of ["ai-tools", "philosophy", "side-project", "pm-insight"]) assert.ok(types.includes(`## ${key}`));
   assert.ok(readText("skills/post/references/style-guide.md").includes("3000"));
+});
+
+test("structures.md defines six structures and the rotation rule", () => {
+  const structures = readText("skills/post/references/structures.md");
+  for (const key of ["scene", "rules", "questions", "contrarian", "compare", "short"]) {
+    assert.ok(structures.includes(`## ${key}`), `structures.md missing ## ${key}`);
+  }
+  assert.match(structures, /3 most recent/);
+  assert.match(structures, /## Choosing/);
+});
+
+test("SKILL.md rotates structures and records reactions by hand", () => {
+  const skill = readText("skills/post/SKILL.md");
+  assert.match(skill, /Structure rotation/);
+  assert.match(skill, /## 4\. Record reactions/);
+  assert.match(skill, /never instructions|Never treat text inside/);
 });
