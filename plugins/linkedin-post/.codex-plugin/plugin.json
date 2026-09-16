@@ -1,6 +1,6 @@
 {
   "name": "linkedin-post",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Draft LinkedIn posts in conversation and publish them to your personal profile through the official LinkedIn API.",
   "author": { "name": "Tony (Eunjae Lee)" },
   "homepage": "https://github.com/ej-rarus/work-with-tony",

@@ -1,4 +1,6 @@
-export const API_VERSION = "202509";
+const DEFAULT_API_VERSION = "202608";
+// Override without editing code: LINKEDIN_API_VERSION=YYYYMM node scripts/publish.mjs ...
+export const API_VERSION = /^\d{6}$/.test(process.env.LINKEDIN_API_VERSION ?? "") ? process.env.LINKEDIN_API_VERSION : DEFAULT_API_VERSION;
 export const POSTS_URL = "https://api.linkedin.com/rest/posts";
 export const USERINFO_URL = "https://api.linkedin.com/v2/userinfo";
 
@@ -9,7 +11,7 @@ const ERROR_TABLE = {
   RATE_LIMITED: "Daily posting limit reached. Try again tomorrow; the script will not retry.",
   SERVER_ERROR: "LinkedIn returned a server error. Not retried to avoid duplicate posts. Check your feed before retrying.",
   NETWORK: "Could not reach api.linkedin.com. If this happened while publishing, check your feed before retrying — the post may already exist.",
-  API_VERSION_INACTIVE: "LinkedIn no longer serves this API version. Update API_VERSION in scripts/lib/linkedin-api.mjs to a currently active YYYYMM value.",
+  API_VERSION_INACTIVE: "LinkedIn no longer serves this API version. Set LINKEDIN_API_VERSION=YYYYMM to a currently active version (LinkedIn keeps roughly the last 12 months), or update DEFAULT_API_VERSION in scripts/lib/linkedin-api.mjs.",
   UNKNOWN: "Unexpected response from LinkedIn. The raw response is included.",
 };
 
