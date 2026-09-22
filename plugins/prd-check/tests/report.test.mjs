@@ -28,7 +28,7 @@ test("buildResult counts severities and toJson is one line", () => {
   ];
   const result = buildResult({ file: "p.md", template: "t.md", rules: "default", doc, findings, rulesObject: rules });
   assert.equal(result.ok, true);
-  assert.deepEqual(result.summary, { lines: doc.lines.length, errorCount: 1, reviewCount: 1 });
+  assert.deepEqual(result.summary, { lines: 113, errorCount: 1, reviewCount: 1 });
   assert.equal(toJson(result).split("\n").length, 1);
   assert.equal(JSON.parse(toJson(result)).findings.length, 2);
 });

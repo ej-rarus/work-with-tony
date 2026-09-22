@@ -46,7 +46,7 @@ The script reports **errors** (missing or reordered sections, table headers that
 node scripts/check.mjs <prd.md> --template <template.md> [--rules <rules.json>] [--report <path>] [--json] [--no-report]
 ```
 
-Exit codes: 0 no errors (review items allowed), 1 errors found, 2 usage, file, template or rules problem. With `--json` the only stdout is one JSON line: `{ ok, file, template, rules, report, summary, findings, structure }` or `{ ok:false, code, message, hint }`.
+Exit codes: 0 no errors (review items allowed), 1 errors found, 2 usage, file, template or rules problem — `code` is one of `BAD_ARGS`, `FILE_NOT_FOUND`, `TEMPLATE_NOT_FOUND`, `NO_HEADINGS`, `RULES_NOT_FOUND`, `RULES_INVALID`, or `UNKNOWN` for anything unexpected. With `--json` the only stdout is one JSON line: `{ ok, file, template, rules, report, summary, findings, structure }` or `{ ok:false, code, message, hint }`.
 
 ## Development
 

@@ -27,6 +27,8 @@ const HINTS = {
   NO_HEADINGS: "The PRD has no Markdown headings. Only Markdown PRDs based on the template can be checked.",
 };
 
+const UNKNOWN_HINT = "Unexpected error; re-run with --json and report the message.";
+
 export class CheckError extends Error {
   constructor(code, message) {
     super(message);
@@ -99,12 +101,12 @@ export function runCheck(argv, deps = {}) {
     const known = error instanceof CheckError || error instanceof RulesError;
     const payload = known
       ? { ok: false, code: error.code, message: error.message, hint: error.hint }
-      : { ok: false, code: "UNKNOWN", message: String(error?.message ?? error) };
+      : { ok: false, code: "UNKNOWN", message: String(error?.message ?? error), hint: UNKNOWN_HINT };
     stdout.write(args?.json || argv.includes("--json") ? `${JSON.stringify(payload)}\n` : `${payload.code}: ${payload.message}\n${payload.hint ?? ""}\n`);
     return 2;
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   process.exitCode = runCheck(process.argv.slice(2));
 }

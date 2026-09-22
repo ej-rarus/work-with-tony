@@ -16,11 +16,11 @@ function weakness(text, phrases) {
   return null;
 }
 
-function checkRow(row, cols, rules, seen) {
+function checkRow(row, cols, rules, seen, idRegex) {
   const rt = rules.requirementTable;
   const out = [];
   const id = cell(row, cols.id);
-  if (id !== undefined && !new RegExp(rt.idPattern).test(id)) {
+  if (id !== undefined && !idRegex.test(id)) {
     out.push(finding("requirements.id", "error", row.line, `ID "${id}"가 형식 ${rt.idPattern}에 맞지 않습니다.`, "템플릿의 ID 형식을 따르세요."));
   }
   if (id !== undefined && seen.has(id)) {
@@ -64,9 +64,10 @@ export function run(doc, _expectations, rules) {
     criteria: columnIndex(table.headers, rt.criteriaColumn),
   };
   if (cols.id === -1) return [];
+  const idRegex = new RegExp(rt.idPattern);
   const seen = new Set();
   return table.rows.flatMap((row) => {
-    const out = checkRow(row, cols, rules, seen);
+    const out = checkRow(row, cols, rules, seen, idRegex);
     const id = cell(row, cols.id);
     if (id) seen.add(id);
     return out;

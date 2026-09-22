@@ -74,3 +74,21 @@ test("missing files and a PRD without headings exit 2 with a code", () => {
     cleanup();
   }
 });
+
+test("an unexpected error is reported as UNKNOWN with a hint", () => {
+  const { dir, cleanup } = makeTempDir();
+  try {
+    const prd = join(dir, "good.md");
+    writeFileSync(prd, fixture("prd-pass.md"));
+    const io = capture();
+    const readFile = () => { throw new Error("boom"); };
+    const code = runCheck([prd, "--template", TEMPLATE, "--json"], { stdout: io.stdout, readFile });
+    const payload = JSON.parse(io.read().trim());
+    assert.equal(code, 2);
+    assert.equal(payload.code, "UNKNOWN");
+    assert.match(payload.message, /boom/);
+    assert.ok(payload.hint, "UNKNOWN payload should include a hint");
+  } finally {
+    cleanup();
+  }
+});

@@ -80,6 +80,17 @@ test("handles CRLF input and an empty document", () => {
   assert.deepEqual(empty.tables, []);
 });
 
+test("strips a leading UTF-8 BOM before parsing", () => {
+  const doc = parseMarkdown("﻿## 1. A\r\n텍스트\n");
+  assert.equal(doc.headings.length, 1);
+  assert.equal(doc.headings[0].number, "1");
+});
+
+test("splits table cells on unescaped pipes and unescapes \\|", () => {
+  const doc = parseMarkdown("## 1. A\n\n| a | b |\n| --- | --- |\n| x \\| y | z |\n");
+  assert.deepEqual(doc.tables[0].rows[0].cells, ["x | y", "z"]);
+});
+
 test("covers parser edge cases: EOF tables, adjacent heading-tables, unterminated fences", () => {
   // Edge case 1: table at EOF with no trailing newline
   const doc1 = parseMarkdown("## 1. A\n| x |\n|---|\n| y |");

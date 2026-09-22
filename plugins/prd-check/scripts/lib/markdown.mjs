@@ -8,7 +8,7 @@ const COMMENT = /^\s*<!--.*-->\s*$/;
 
 function splitCells(line) {
   const trimmed = line.trim().replace(/^\|/, "").replace(/\|$/, "");
-  return trimmed.split("|").map((c) => c.trim());
+  return trimmed.split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|"));
 }
 
 function parseHeading(raw, level, line) {
@@ -34,7 +34,7 @@ function readTable(lines, start, headingIndex) {
 }
 
 export function parseMarkdown(text) {
-  const lines = String(text).replace(/\r\n/g, "\n").split("\n");
+  const lines = String(text).replace(/^﻿/, "").replace(/\r\n/g, "\n").split("\n");
   const headings = [];
   const tables = [];
   const paragraphs = [];

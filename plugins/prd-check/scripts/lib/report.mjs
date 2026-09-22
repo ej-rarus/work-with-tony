@@ -59,7 +59,7 @@ export function buildResult({ file, template, rules, doc, findings, rulesObject 
     template,
     rules,
     summary: {
-      lines: doc.lines.length,
+      lines: doc.lines.length - (doc.lines[doc.lines.length - 1] === "" ? 1 : 0),
       errorCount: sorted.filter((f) => f.severity === "error").length,
       reviewCount: sorted.filter((f) => f.severity === "review").length,
     },
