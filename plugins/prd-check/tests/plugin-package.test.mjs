@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
-import { pluginRoot, readJson, repoRoot } from "./helpers.mjs";
+import { pluginRoot, readJson, readText, repoRoot } from "./helpers.mjs";
 
 test("manifests agree on name, version and author", () => {
   const claude = readJson(".claude-plugin/plugin.json");
@@ -50,4 +50,20 @@ test("no company names or secret-looking values in the plugin", () => {
     const text = readFileSync(file, "utf8");
     for (const p of banned) assert.ok(!p.test(text), `${p} found in ${file}`);
   }
+});
+
+test("SKILL.md has frontmatter and references every moving part", () => {
+  const skill = readText("skills/check/SKILL.md");
+  assert.match(skill, /^---\nname: check\ndescription: .+\n---\n/);
+  for (const needle of [
+    "scripts/check.mjs", "--template", "--rules", "--json", "references/default-rules.json",
+    "references/review-guide.md", "PRD_CHECK_HOME", "config.json", "<!-- skill-review -->",
+    "review.criteria", "review.scope", "review.asserted", "review.openItems", "/prd-check:check", "CLAUDE_PLUGIN_ROOT",
+  ]) assert.ok(skill.includes(needle), `SKILL.md missing ${needle}`);
+  assert.match(skill, /Never (edit|modify) the PRD/i);
+});
+
+test("review guide defines the four judgment rules", () => {
+  const guide = readText("skills/check/references/review-guide.md");
+  for (const id of ["review.criteria", "review.scope", "review.asserted", "review.openItems"]) assert.ok(guide.includes(`## ${id}`));
 });
