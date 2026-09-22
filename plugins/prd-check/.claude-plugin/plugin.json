@@ -1,0 +1,9 @@
+{
+  "name": "prd-check",
+  "version": "0.1.0",
+  "description": "Check a Markdown PRD against your team's template and rules, and write a line-numbered report of what to fix.",
+  "author": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["prd", "product-management", "documentation", "review"]
+}

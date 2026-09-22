@@ -1,0 +1,20 @@
+{
+  "name": "prd-check",
+  "version": "0.1.0",
+  "description": "Check a Markdown PRD against your team's template and rules, and write a line-numbered report of what to fix.",
+  "author": { "name": "Tony (Eunjae Lee)" },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["prd", "product-management", "documentation", "review"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "PRD Check",
+    "shortDescription": "Check a PRD against your template",
+    "longDescription": "Parse a Markdown PRD, compare it with your team's PRD template and a small rule file, and produce a report that names the line, the rule, and the fix. Never edits the PRD.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": ["$prd-check:check ~/docs/project-prd.md"]
+  }
+}

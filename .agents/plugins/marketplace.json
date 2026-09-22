@@ -17,6 +17,12 @@
       "category": "Productivity"
     },
     {
+      "name": "prd-check",
+      "source": { "source": "local", "path": "./plugins/prd-check" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    },
+    {
       "name": "suno-music",
       "source": {
         "source": "local",
