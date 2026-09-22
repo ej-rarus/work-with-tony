@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { pluginRoot, readJson, readText, repoRoot } from "./helpers.mjs";
@@ -33,8 +33,11 @@ test("package.json has no runtime dependencies and node>=20", () => {
   assert.equal(pkg.scripts.test, "node --test tests/*.test.mjs");
 });
 
+const SKIP_DIRS = new Set([".git", "node_modules"]);
+
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
+    if (SKIP_DIRS.has(name)) continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) walk(full, out);
     else out.push(full);
@@ -42,13 +45,36 @@ function walk(dir, out = []) {
   return out;
 }
 
+const BANNED = [/LUKUKU/i, /nvapi-[A-Za-z0-9_-]{20,}/, /client_secret"\s*:\s*"[^"]{8,}"/i];
+
 test("no company names or secret-looking values in the plugin", () => {
-  const banned = [/LUKUKU/i, /nvapi-[A-Za-z0-9_-]{20,}/, /client_secret"\s*:\s*"[^"]{8,}"/i];
   const thisTestFile = resolve(fileURLToPath(import.meta.url));
   for (const file of walk(pluginRoot)) {
     if (resolve(file) === thisTestFile) continue;
     const text = readFileSync(file, "utf8");
-    for (const p of banned) assert.ok(!p.test(text), `${p} found in ${file}`);
+    for (const p of BANNED) assert.ok(!p.test(text), `${p} found in ${file}`);
+  }
+});
+
+const DOC_EXCEPTIONS = new Set([
+  // Predate this branch (feat/prd-check) and are outside its scope; tracked here so a
+  // future doc with the same problem still fails this test instead of hiding behind them.
+  "superpowers/plans/2026-09-04-linkedin-post.md",
+  "superpowers/plans/2026-09-04-linkedin-post-ledger.md",
+  "superpowers/specs/2026-09-04-linkedin-post-design.md",
+  "superpowers/plans/2026-09-05-suno-music-web-prepare.md",
+  // This plan quotes the banned-pattern regex literal itself as sample code for the
+  // plugin's own test (same reason plugin-package.test.mjs excludes itself above).
+  "superpowers/plans/2026-09-17-prd-check.md",
+]);
+
+test("no company names or secret-looking values in docs", () => {
+  const docsRoot = resolve(repoRoot, "docs");
+  for (const file of walk(docsRoot)) {
+    const rel = relative(docsRoot, file).split(sep).join("/");
+    if (DOC_EXCEPTIONS.has(rel)) continue;
+    const text = readFileSync(file, "utf8");
+    for (const p of BANNED) assert.ok(!p.test(text), `${p} found in ${file}`);
   }
 });
 
