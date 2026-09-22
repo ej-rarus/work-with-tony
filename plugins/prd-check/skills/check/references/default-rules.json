@@ -1,0 +1,22 @@
+{
+  "requirementTable": {
+    "section": "5.1",
+    "idColumn": "ID",
+    "idPattern": "^FR-\\d{3}$",
+    "requirementColumn": "요구사항",
+    "priorityColumn": "우선순위",
+    "priorityValues": ["필수", "선택"],
+    "statusColumn": "확정 상태",
+    "statusValues": ["확정", "확인 필요", "보류"],
+    "criteriaColumn": "완료 기준",
+    "weakCriteria": ["정상 동작", "정상 작동", "사용하기 편함", "문제 없이", "잘 동작"]
+  },
+  "placeholderPattern": "^\\[.+\\]$",
+  "requiredInfoSection": "1.1",
+  "openItemsSection": "7.2",
+  "openItemsHeaders": ["확인할 사항", "확인 담당", "확인 예정일"],
+  "misplacedTableSignatures": [
+    { "name": "schedule", "allOf": ["담당"], "anyOf": ["일정", "기한", "착수", "완료일"] },
+    { "name": "decision-log", "anyOf": ["결정값", "승인일", "결정 로그"] }
+  ]
+}
