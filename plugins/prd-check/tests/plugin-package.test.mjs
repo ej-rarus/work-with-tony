@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { pluginRoot, readJson, repoRoot } from "./helpers.mjs";
 
@@ -34,7 +35,6 @@ test("package.json has no runtime dependencies and node>=20", () => {
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
-    if (name === "tests") continue;
     const full = join(dir, name);
     if (statSync(full).isDirectory()) walk(full, out);
     else out.push(full);
@@ -44,7 +44,9 @@ function walk(dir, out = []) {
 
 test("no company names or secret-looking values in the plugin", () => {
   const banned = [/LUKUKU/i, /nvapi-[A-Za-z0-9_-]{20,}/, /client_secret"\s*:\s*"[^"]{8,}"/i];
+  const thisTestFile = resolve(fileURLToPath(import.meta.url));
   for (const file of walk(pluginRoot)) {
+    if (resolve(file) === thisTestFile) continue;
     const text = readFileSync(file, "utf8");
     for (const p of banned) assert.ok(!p.test(text), `${p} found in ${file}`);
   }
