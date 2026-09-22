@@ -79,3 +79,19 @@ test("handles CRLF input and an empty document", () => {
   assert.deepEqual(empty.headings, []);
   assert.deepEqual(empty.tables, []);
 });
+
+test("covers parser edge cases: EOF tables, adjacent heading-tables, unterminated fences", () => {
+  // Edge case 1: table at EOF with no trailing newline
+  const doc1 = parseMarkdown("## 1. A\n| x |\n|---|\n| y |");
+  assert.deepEqual(doc1.tables[0].rows, [{ line: 4, cells: ["y"] }]);
+
+  // Edge case 2: heading immediately followed by table (no blank line)
+  const doc2 = parseMarkdown("## 2. B\n| h |\n|---|\n| v |\n");
+  assert.equal(doc2.tables[0].headingIndex, 0);
+  assert.equal(doc2.tables[0].line, 2);
+
+  // Edge case 3: unterminated fence skips to EOF
+  const doc3 = parseMarkdown("## 3. C\n```\n## not heading\n| no | table |\n");
+  assert.equal(doc3.headings.length, 1);
+  assert.equal(doc3.tables.length, 0);
+});
