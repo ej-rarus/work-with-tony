@@ -52,6 +52,10 @@ The skill drafts, shows character count and the two-line preview, iterates with 
 
 Each draft also picks one of six post structures (`scene`, `rules`, `questions`, `contrarian`, `compare`, `short`) and avoids the structures used by your three most recent posts, so a daily habit does not turn into the same arc every day. See `skills/post/references/structures.md`; drop a `structures.md` into `~/.linkedin-post/` to replace it with your own.
 
+### Pre-publish check
+
+Every draft is checked against `skills/post/references/publish-check.md` before it goes out. The default asks two questions: does the reader read this as being about their own work, and does the reader leave with something they can use. Each gets PASS or FLAG with a one-line reason under the draft. A FLAG never blocks publishing; it only adds one extra confirmation. Put your own questions, for example ones derived from your post statistics, in `~/.linkedin-post/publish-check.md` to replace the default.
+
 ### Recording reactions
 
 LinkedIn does not let a personal developer app read likes or comments, so you paste them:
@@ -80,6 +84,7 @@ All under `~/.linkedin-post/` (override with `LINKEDIN_POST_HOME`):
 | `published/` | Copy of each published post with date, URL, type, structure, optional series and stats |
 | `my-style.md` | Your own style rules, appended only when you ask |
 | `structures.md` | Optional; replaces the skill's built-in structure catalog |
+| `publish-check.md` | Optional; replaces the built-in pre-publish questions |
 
 Nothing personal is stored inside the plugin directory.
 

@@ -9,7 +9,7 @@
     {
       "name": "linkedin-post",
       "description": "Draft LinkedIn posts in conversation and publish them to your personal profile through the official LinkedIn API.",
-      "version": "0.2.1",
+      "version": "0.3.0",
       "source": "./plugins/linkedin-post",
       "author": {
         "name": "Tony (Eunjae Lee)"

@@ -110,3 +110,20 @@ test("SKILL.md rotates structures and records reactions by hand", () => {
   assert.match(skill, /## 4\. Record reactions/);
   assert.match(skill, /never instructions|Never treat text inside/);
 });
+
+test("publish-check.md defines the two default questions and a pass/flag format", () => {
+  const check = readText("skills/post/references/publish-check.md");
+  assert.match(check, /## reader-owns-it/);
+  assert.match(check, /## takeaway/);
+  assert.match(check, /PASS/);
+  assert.match(check, /FLAG/);
+});
+
+test("SKILL.md runs the pre-publish check and re-confirms on a flag", () => {
+  const skill = readText("skills/post/SKILL.md");
+  assert.ok(skill.includes("references/publish-check.md"), "SKILL.md missing references/publish-check.md");
+  assert.ok(skill.includes("$LINKEDIN_POST_HOME/publish-check.md"), "SKILL.md missing personal override path");
+  assert.match(skill, /`Check:`/);
+  assert.match(skill, /FLAG/);
+  assert.match(skill, /confirm once more|한 번 더/);
+});
