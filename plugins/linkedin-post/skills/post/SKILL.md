@@ -109,7 +109,7 @@ On confirmation:
    - Reply with the URL and the character count. Nothing else is required.
 4. If `ok` is false:
    - Leave the draft in `drafts/`.
-   - Show `code`, `message`, `hint`, and `response` (when present — LinkedIn's raw rejection detail, e.g. for `BAD_REQUEST`) to the user in plain language. For `MISSING_TOKEN`/`TOKEN_EXPIRED`/`UNAUTHORIZED`, offer to run `node "${CLAUDE_PLUGIN_ROOT}/scripts/auth.mjs"` and then retry the same draft file. For `SERVER_ERROR` or `NETWORK`, tell the user to check their feed before retrying because the post may have gone through.
+   - Show `code`, `message`, `hint`, and `response` (when present — LinkedIn's raw rejection detail, e.g. for `BAD_REQUEST`) to the user in plain language. For `MISSING_TOKEN`/`TOKEN_EXPIRED`/`UNAUTHORIZED`, offer to run `node "${CLAUDE_PLUGIN_ROOT}/scripts/auth.mjs"` and then retry the same draft file. For `API_VERSION_INACTIVE`, run `node "${CLAUDE_PLUGIN_ROOT}/scripts/doctor.mjs"` and use its `latestActive` to suggest `LINKEDIN_API_VERSION=<latestActive>` for the retry. For `SERVER_ERROR` or `NETWORK`, tell the user to check their feed before retrying because the post may have gone through.
    - Never rerun publish automatically.
 
 Use `node "${CLAUDE_PLUGIN_ROOT}/scripts/publish.mjs" "<draft path>" --dry-run` when you need to check the token or the escaped body without posting.

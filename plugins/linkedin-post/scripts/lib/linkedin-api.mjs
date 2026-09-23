@@ -1,6 +1,12 @@
-const DEFAULT_API_VERSION = "202608";
+export const DEFAULT_API_VERSION = "202608";
+
 // Override without editing code: LINKEDIN_API_VERSION=YYYYMM node scripts/publish.mjs ...
-export const API_VERSION = /^\d{6}$/.test(process.env.LINKEDIN_API_VERSION ?? "") ? process.env.LINKEDIN_API_VERSION : DEFAULT_API_VERSION;
+export function resolveApiVersion(env = process.env) {
+  const fromEnv = /^\d{6}$/.test(env.LINKEDIN_API_VERSION ?? "");
+  return { version: fromEnv ? env.LINKEDIN_API_VERSION : DEFAULT_API_VERSION, source: fromEnv ? "env" : "default" };
+}
+
+export const API_VERSION = resolveApiVersion().version;
 export const POSTS_URL = "https://api.linkedin.com/rest/posts";
 export const USERINFO_URL = "https://api.linkedin.com/v2/userinfo";
 
@@ -36,6 +42,23 @@ export function mapStatusToError(status, body) {
     : status >= 500 ? "SERVER_ERROR"
     : "UNKNOWN";
   return new LinkedInApiError(code, status, body);
+}
+
+// Read-only check of whether LinkedIn still serves a version. A personal app
+// may not read posts, so an active version answers 403 (permission) while a
+// retired one answers 426 NONEXISTENT_VERSION before permissions are checked.
+export async function probeApiVersion({ accessToken, authorUrn, version, fetchImpl = fetch }) {
+  const url = `${POSTS_URL}?q=author&author=${encodeURIComponent(authorUrn)}&count=1`;
+  const headers = { Authorization: `Bearer ${accessToken}`, "LinkedIn-Version": version, "X-Restli-Protocol-Version": "2.0.0" };
+  let res;
+  try {
+    res = await fetchImpl(url, { method: "GET", headers });
+  } catch (error) {
+    throw new LinkedInApiError("NETWORK", 0, String(error?.message ?? error));
+  }
+  if (res.status === 426) return "inactive";
+  if (res.ok || res.status === 403) return "active";
+  throw mapStatusToError(res.status, await res.text());
 }
 
 export function postUrl(id) {

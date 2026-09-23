@@ -35,6 +35,16 @@ The client secret is typed into the conversation once; it is stored only in `~/.
 
 Tokens last 60 days. When one is about to expire the publish step warns you; when it has expired the skill offers to run sign-in again.
 
+## Health check
+
+```
+/linkedin-post:doctor
+```
+
+(`$linkedin-post:doctor` in Codex.) Checks the setup before it breaks a publish: config, token expiry date and days left, token file permissions, the `LinkedIn-Version` in use and roughly when LinkedIn retires it, drafts left behind by a failed publish, and, online, whether LinkedIn accepts the token and still serves the version (plus the newest version it serves). The online part only makes read-only requests; add `--offline` to skip it.
+
+LinkedIn retires each monthly API version after about 12 months. When the doctor reports the version as inactive, publish with `LINKEDIN_API_VERSION=<latestActive>` right away, and bump `DEFAULT_API_VERSION` in `scripts/lib/linkedin-api.mjs` for a lasting fix.
+
 ## Usage
 
 Claude Code uses `/linkedin-post:post ...`; in Codex type `$linkedin-post:post ...` with the same arguments.
@@ -95,9 +105,11 @@ node scripts/auth.mjs                       # browser sign-in, saves token.json
 node scripts/publish.mjs body.md            # publish, prints one JSON line
 node scripts/publish.mjs body.md --dry-run  # show escaped request, no API call
 node scripts/record.mjs published/2026-09-10-post.md --likes 23 --comments 4 --reactions-file comments.md
+node scripts/doctor.mjs                     # health check, prints one JSON line
+node scripts/doctor.mjs --offline           # same, without network calls
 ```
 
-Exit codes for `auth.mjs` and `publish.mjs`: 0 success, 1 LinkedIn API error, 2 configuration or validation error. For `record.mjs` (no API call): 0 success, 1 usage error, 2 file or frontmatter problem.
+Exit codes for `auth.mjs` and `publish.mjs`: 0 success, 1 LinkedIn API error, 2 configuration or validation error. For `record.mjs` (no API call): 0 success, 1 usage error, 2 file or frontmatter problem. For `doctor.mjs`: 0 no failed check (warnings allowed), 1 at least one failed check, 2 bad arguments.
 
 ## Out of scope (for now)
 

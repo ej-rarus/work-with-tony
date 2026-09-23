@@ -127,3 +127,16 @@ test("SKILL.md runs the pre-publish check and re-confirms on a flag", () => {
   assert.match(skill, /FLAG/);
   assert.match(skill, /confirm once more|한 번 더/);
 });
+
+test("doctor skill has frontmatter, runs doctor.mjs, and never prints secrets", () => {
+  const skill = readText("skills/doctor/SKILL.md");
+  assert.match(skill, /^---\nname: doctor\ndescription: .+\n---\n/);
+  for (const needle of ["scripts/doctor.mjs", "CLAUDE_PLUGIN_ROOT", "/linkedin-post:doctor", "--offline", "LINKEDIN_API_VERSION", "scripts/auth.mjs"]) {
+    assert.ok(skill.includes(needle), `doctor SKILL.md missing ${needle}`);
+  }
+  assert.match(skill, /Never paste/);
+});
+
+test("post skill points at the doctor when auth or API version fails", () => {
+  assert.ok(readText("skills/post/SKILL.md").includes("scripts/doctor.mjs"));
+});
