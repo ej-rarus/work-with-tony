@@ -1,0 +1,46 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 20 is the minimum every plugin declares in package.json engines.
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Check every plugin and run its tests
+        run: node plugins/plugin-release/scripts/release.mjs check --repo "$GITHUB_WORKSPACE" --all --tests
+
+  validate:
+    name: claude plugin validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Claude Code CLI
+        run: npm install --global @anthropic-ai/claude-code
+      - name: Validate the marketplace
+        run: claude plugin validate . --strict
+      - name: Validate every plugin
+        run: node plugins/plugin-release/scripts/release.mjs check --repo "$GITHUB_WORKSPACE" --all --native

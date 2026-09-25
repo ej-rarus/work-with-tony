@@ -1,5 +1,7 @@
 # work-with-tony
 
+[![check](https://github.com/ej-rarus/work-with-tony/actions/workflows/check.yml/badge.svg)](https://github.com/ej-rarus/work-with-tony/actions/workflows/check.yml)
+
 일하면서 반복되는 일을 대화 한 줄로 끝내려고 만든 개인 플러그인 모음입니다. **Claude Code**와 **Codex** 양쪽에서 같은 플러그인을 그대로 쓸 수 있습니다.
 
 > **English:** A personal catalog of Claude Code and Codex plugins by Tony (Eunjae Lee): LinkedIn publishing, Instagram carousels, one-source repurposing into both, PRD review, file explanations with practice lessons, Korean HWP/HWPX form filling, Suno form prep, plugin releases, and everyday work follow-through. Every plugin has its own English README under `plugins/<name>/`. Add the marketplace with `/plugin marketplace add ej-rarus/work-with-tony` (Claude Code) or `codex plugin marketplace add ej-rarus/work-with-tony` (Codex).
@@ -305,6 +307,14 @@ work-with-tony/
 npm test
 claude plugin validate . --strict
 ```
+
+저장소 전체는 한 번에 점검할 수 있습니다. 모든 플러그인의 매니페스트, 버전, 마켓플레이스 등록, 테스트를 확인해요.
+
+```text
+node plugins/plugin-release/scripts/release.mjs check --repo "$PWD" --all --tests
+```
+
+main에 푸시하거나 PR을 열면 GitHub Actions가 같은 점검을 Node 20·22·24에서 돌리고, `claude plugin validate`까지 실행합니다. 결과는 맨 위 배지에서 볼 수 있어요.
 
 버그 제보나 아이디어는 [Issues](https://github.com/ej-rarus/work-with-tony/issues)에 남겨 주세요.
 
