@@ -18,7 +18,7 @@
 | [**prd-check**](plugins/prd-check/) | Markdown PRD를 팀 표준 양식과 비교해 줄 번호가 달린 점검표 작성 | PRD를 리뷰에 올리기 전에 빠진 절이나 형식 오류를 잡고 싶을 때 |
 | [**suno-music**](plugins/suno-music/) | 확정한 가사와 스타일을 Suno Advanced 입력창에 채워 두기 (생성 버튼은 누르지 않음) | 가사를 여러 번 옮겨 붙이다 실수하는 게 싫을 때 |
 | [**plugin-release**](plugins/plugin-release/) | 플러그인 패키지 검증, 마켓플레이스 정보 동기화, 릴리스 커밋과 푸시 확인 | 직접 만든 플러그인의 버전을 올리고 배포할 때 |
-| [**tony-workmate**](plugins/tony-workmate/) | 요청 정리, 양식 유지 문서 수정, 회의 후속, 캘린더 등록, 전달, 비용 청구, 미응답 확인 | 흩어진 업무 요청을 끝까지 마무리하고 싶을 때 |
+| [**tony-workmate**](plugins/tony-workmate/) | 요청 정리, 채널별 메시지 초안, 양식 유지 문서 수정, 회의 후속, 캘린더 등록, 전달, 비용 청구, 미응답 확인 | 흩어진 업무 요청을 끝까지 마무리하고 싶을 때 |
 
 ## 빠른 시작
 
@@ -226,11 +226,12 @@ codex plugin add linkedin-post@work-with-tony
 
 [자세히 보기](plugins/plugin-release/)
 
-### tony-workmate: 업무를 끝까지 마무리하는 7가지 스킬
+### tony-workmate: 업무를 끝까지 마무리하는 8가지 스킬
 
 | 스킬 | 하는 일 |
 |---|---|
 | `request-to-action` | 고객 요청을 담당자에게 보낼 확인 요청으로 정리 |
+| `draft-message` | Teams·이메일·Slack 말투에 맞춘 메시지 초안 (보내지 않음) |
 | `document-revise` | 기존 양식을 그대로 두고 지정한 부분만 수정 |
 | `meeting-followup` | 회의 기록에서 결정사항, 미결정, 후속 업무 분리 |
 | `calendar-entry` | 합의한 일정을 Apple 캘린더에 등록하거나 시간 변경 |

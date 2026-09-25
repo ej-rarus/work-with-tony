@@ -44,8 +44,8 @@
     },
     {
       "name": "tony-workmate",
-      "description": "Turn requests into actionable handoffs, preserve document formats, and finish meetings, calendar entries, deliveries, expense claims, and follow-ups.",
-      "version": "0.1.0",
+      "description": "Turn requests into actionable handoffs, draft channel-ready messages, preserve document formats, and finish meetings, calendar entries, deliveries, expense claims, and follow-ups.",
+      "version": "0.2.0",
       "source": "./plugins/tony-workmate",
       "author": {
         "name": "Tony (Eunjae Lee)",

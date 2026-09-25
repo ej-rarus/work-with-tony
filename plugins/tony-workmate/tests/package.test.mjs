@@ -5,8 +5,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root=path.resolve(fileURLToPath(new URL('..',import.meta.url)));
-const expected=['request-to-action','document-revise','meeting-followup','calendar-entry','deliver','expense-claim','followup-tracker'];
-test('both hosts expose the seven real skill entrypoints at a matching version',()=>{
+const expected=['request-to-action','draft-message','document-revise','meeting-followup','calendar-entry','deliver','expense-claim','followup-tracker'];
+test('both hosts expose the eight real skill entrypoints at a matching version',()=>{
   const codex=JSON.parse(fs.readFileSync(path.join(root,'.codex-plugin/plugin.json')));
   const claude=JSON.parse(fs.readFileSync(path.join(root,'.claude-plugin/plugin.json')));
   const pkg=JSON.parse(fs.readFileSync(path.join(root,'package.json')));
@@ -29,4 +29,20 @@ test('bundled Markdown references resolve within the installed package',()=>{
       assert.ok(fs.existsSync(target),`${file}: missing ${match[1]}`);
     }
   }
+});
+
+test('draft-message writes channel-specific copy and never sends',()=>{
+  const text=fs.readFileSync(path.join(root,'skills','draft-message','SKILL.md'),'utf8');
+  for(const needle of ['work-contract.md','Teams','이메일','Slack','제목','deliver'])assert.ok(text.includes(needle),`draft-message missing ${needle}`);
+  assert.match(text,/보내지 않는다/);
+  assert.doesNotMatch(text,/[가-힣]{2,3}님께/,'examples must not name real people');
+});
+test('meeting-followup carries a built-in meeting-notes format and file naming',()=>{
+  const text=fs.readFileSync(path.join(root,'skills','meeting-followup','SKILL.md'),'utf8');
+  for(const needle of ['| 항목 | 결정 사항 |','| # | 담당 | 내용 | 기한 |','_정리본.md','**참석','문어체'])assert.ok(text.includes(needle),`meeting-followup missing ${needle}`);
+});
+test('README lists every skill',()=>{
+  const readme=fs.readFileSync(path.join(root,'README.md'),'utf8');
+  for(const name of expected)assert.ok(readme.includes('`'+name+'`'),`README missing ${name}`);
+  assert.ok(readme.includes('8개 스킬'));
 });
