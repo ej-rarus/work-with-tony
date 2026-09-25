@@ -1,0 +1,9 @@
+{
+  "name": "explain-this",
+  "version": "0.1.0",
+  "description": "Explain local Markdown, HTML, and JSON files and optionally build a safe offline learning exercise.",
+  "author": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["learning", "explain", "markdown", "html", "json", "offline"]
+}

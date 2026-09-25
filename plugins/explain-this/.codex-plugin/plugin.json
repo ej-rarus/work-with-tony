@@ -1,0 +1,24 @@
+{
+  "name": "explain-this",
+  "version": "0.1.0",
+  "description": "Explain local Markdown, HTML, and JSON files and optionally build a safe offline learning exercise.",
+  "author": { "name": "Tony (Eunjae Lee)" },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["learning", "explain", "markdown", "html", "json", "offline"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Explain This",
+    "shortDescription": "Learn from a local Markdown, HTML, or JSON file",
+    "longDescription": "Ground a plain-language explanation in exact passages from a local file, then optionally create a private offline lesson with a reconstructed practice example.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Education",
+    "capabilities": ["Local Files", "Interactive", "Write"],
+    "brandColor": "#2457E6",
+    "defaultPrompt": [
+      "$explain-this:explain 이 파일을 실제 내용에 근거해 쉽게 설명해줘",
+      "$explain-this:explain 이 JSON 파일을 설명하고 오프라인 연습 화면도 만들어줘"
+    ]
+  }
+}

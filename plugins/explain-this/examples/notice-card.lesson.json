@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "sourceHash": "ef417108aa54aadb32b54af6c5dbd5b9275fc08c1be788e813517f94c585fef3",
+  "title": "HTML 알림 카드 구조 이해하기",
+  "summary": "제목, 본문, 버튼을 만드는 HTML 요소를 실제 마크업에서 찾아봅니다.",
+  "sections": [
+    {
+      "title": "가장 중요한 제목",
+      "quote": "<h1>배포 알림</h1>",
+      "explanation": "h1 요소는 페이지에서 가장 중요한 제목을 나타냅니다. 시작 태그와 끝 태그 사이의 텍스트가 화면에 표시될 제목입니다."
+    },
+    {
+      "title": "사용자가 누르는 버튼",
+      "quote": "<button type=\"button\">확인</button>",
+      "explanation": "button 요소는 클릭할 수 있는 조작을 나타냅니다. type=\"button\"은 이 버튼이 폼 제출용이 아님을 명시합니다."
+    }
+  ],
+  "practice": {
+    "kind": "html",
+    "task": "알림 카드의 제목, 설명, 버튼 문구와 버튼 색상을 바꿔 보세요.",
+    "hint": "입력값은 고정된 연습용 카드에만 반영되며 원본 HTML은 실행되지 않습니다.",
+    "initial": {
+      "heading": "배포 알림",
+      "paragraph": "새 버전이 준비되었습니다.",
+      "buttonText": "확인",
+      "buttonColor": "#2457E6"
+    }
+  }
+}

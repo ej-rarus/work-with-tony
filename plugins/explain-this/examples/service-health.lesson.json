@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "sourceHash": "7e4d9c10dfeac39612eb5bdd403a1d488430fac7dfa68d212a52bac378b79b65",
+  "title": "서비스 상태 JSON 이해하기",
+  "summary": "JSON 객체가 문자열, 불리언, 숫자, 배열 값을 어떻게 표현하는지 실제 항목으로 배웁니다.",
+  "sections": [
+    {
+      "title": "불리언 상태값",
+      "quote": "\"healthy\": true",
+      "explanation": "healthy 키의 값 true는 서비스가 정상 상태임을 예/아니오 형태의 불리언 값으로 표현합니다."
+    },
+    {
+      "title": "지역 목록",
+      "quote": "\"regions\": [\"seoul\", \"tokyo\"]",
+      "explanation": "대괄호는 여러 값을 순서대로 담는 배열입니다. 여기에는 두 지역 이름이 문자열로 들어 있습니다."
+    }
+  ],
+  "practice": {
+    "kind": "json",
+    "task": "서비스 이름, 상태, 재시도 시간, 지역 목록을 바꾸고 JSON 형식을 확인해 보세요.",
+    "hint": "문자열에는 큰따옴표를 쓰고 마지막 항목 뒤에는 쉼표를 붙이지 않습니다.",
+    "initial": {
+      "json": "{\n  \"service\": \"orders\",\n  \"healthy\": true,\n  \"retrySeconds\": 30,\n  \"regions\": [\"seoul\", \"tokyo\"]\n}"
+    }
+  }
+}

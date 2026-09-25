@@ -1,0 +1,6 @@
+{
+  "service": "orders",
+  "healthy": true,
+  "retrySeconds": 30,
+  "regions": ["seoul", "tokyo"]
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "date": "2026-09-10",
+    "macrostructure": "Component Playground",
+    "theme": "Cobalt",
+    "theme_axes": "light / grotesk-sans / cool-blue",
+    "vibe": "contemporary Korean digital field notes",
+    "enrichment": "subject-specific typographic objects",
+    "brief": "Redesign Tony's PM and IT carousel system as a contemporary digital magazine."
+  },
+  {
+    "date": "2026-09-10",
+    "macrostructure": "Narrative Workflow",
+    "theme": "custom",
+    "theme_axes": "cool-paper / Korean-serif-editorial / cobalt-blue",
+    "vibe": "technical work note with editorial restraint",
+    "enrichment": "none",
+    "brief": "Build fixed-canvas Instagram carousels for Tony's PM and IT education content."
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "name": "instagram-carousel",
+  "version": "0.1.0",
+  "description": "Plan and build editable editorial Instagram carousels, then export verified 1080x1350 PNG slides locally.",
+  "author": { "name": "Tony (Eunjae Lee)" },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["instagram", "carousel", "editorial", "content", "png", "offline"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Instagram Carousel",
+    "shortDescription": "Plan and export editorial Instagram carousel slides",
+    "longDescription": "Turn a topic, notes, or an existing draft into an editable carousel project with caption, alt text, fixed local templates, overflow checks, and exact-size PNG exports.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Creative",
+    "capabilities": ["Local Files", "Write", "Creative"],
+    "brandColor": "#2457E6",
+    "defaultPrompt": [
+      "$instagram-carousel:create 이 주제로 인스타그램 카드뉴스 구성을 짜줘",
+      "$instagram-carousel:create 이 메모를 7장 카드뉴스와 PNG로 만들어줘"
+    ]
+  }
+}

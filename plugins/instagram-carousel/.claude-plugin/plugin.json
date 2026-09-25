@@ -1,0 +1,9 @@
+{
+  "name": "instagram-carousel",
+  "version": "0.1.0",
+  "description": "Plan and build editable editorial Instagram carousels, then export verified 1080x1350 PNG slides locally.",
+  "author": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["instagram", "carousel", "editorial", "content", "png", "offline"]
+}

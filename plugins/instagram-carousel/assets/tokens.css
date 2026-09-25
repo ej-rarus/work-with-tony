@@ -1,0 +1,48 @@
+/* Hallmark · macrostructure: Component Playground · tone: contemporary digital magazine · anchor hue: cobalt blue · pre-emit critique: P5 H5 E4 S5 R5 V5 */
+:root {
+  --color-paper: oklch(98% 0.009 248);
+  --color-paper-alt: oklch(94% 0.026 248);
+  --color-paper-deep: oklch(90% 0.038 248);
+  --color-ink: oklch(20% 0.032 254);
+  --color-ink-soft: oklch(46% 0.035 252);
+  --color-rule: oklch(82% 0.032 248);
+  --color-accent: oklch(54% 0.205 257);
+  --color-accent-soft: oklch(88% 0.075 247);
+  --color-accent-ink: oklch(98% 0.009 248);
+  --color-night: oklch(24% 0.086 258);
+  --color-night-soft: oklch(34% 0.096 258);
+  --color-night-ink: oklch(98% 0.009 248);
+  --font-display: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-body: "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-mono: "SFMono-Regular", "Menlo", monospace;
+  --space-3xs: 4px;
+  --space-2xs: 8px;
+  --space-xs: 12px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --space-2xl: 72px;
+  --space-3xl: 104px;
+  --space-4xl: 152px;
+  --space-canvas-inline: 76px;
+  --space-canvas-footer: 44px;
+  --text-xs: 19px;
+  --text-sm: 25px;
+  --text-body: 36px;
+  --text-prompt: 31px;
+  --text-title: 72px;
+  --text-display-s: 94px;
+  --text-display: 120px;
+  --text-giant: 246px;
+  --rule-hairline: 2px;
+  --rule-strong: 10px;
+  --rule-statement: 20px;
+  --radius-flat: 0;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+}

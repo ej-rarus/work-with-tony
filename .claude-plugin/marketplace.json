@@ -20,7 +20,9 @@
       "description": "Check a Markdown PRD against your team's template and rules, and write a line-numbered report of what to fix.",
       "version": "0.1.0",
       "source": "./plugins/prd-check",
-      "author": { "name": "Tony (Eunjae Lee)" }
+      "author": {
+        "name": "Tony (Eunjae Lee)"
+      }
     },
     {
       "name": "suno-music",
@@ -48,6 +50,24 @@
       "author": {
         "name": "Tony (Eunjae Lee)",
         "url": "https://github.com/ej-rarus"
+      }
+    },
+    {
+      "name": "explain-this",
+      "description": "Explain local Markdown, HTML, and JSON files and optionally build a safe offline learning exercise.",
+      "version": "0.1.0",
+      "source": "./plugins/explain-this",
+      "author": {
+        "name": "Tony (Eunjae Lee)"
+      }
+    },
+    {
+      "name": "instagram-carousel",
+      "description": "Plan and build editable editorial Instagram carousels, then export verified 1080x1350 PNG slides locally.",
+      "version": "0.1.0",
+      "source": "./plugins/instagram-carousel",
+      "author": {
+        "name": "Tony (Eunjae Lee)"
       }
     }
   ]

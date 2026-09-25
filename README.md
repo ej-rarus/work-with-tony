@@ -2,13 +2,15 @@
 
 일하면서 반복되는 일을 대화 한 줄로 끝내려고 만든 개인 플러그인 모음입니다. **Claude Code**와 **Codex** 양쪽에서 같은 플러그인을 그대로 쓸 수 있습니다.
 
-> **English:** A personal catalog of Claude Code and Codex plugins by Tony (Eunjae Lee): LinkedIn publishing, PRD review, Suno form prep, plugin releases, and everyday work follow-through. Every plugin has its own English README under `plugins/<name>/`. Add the marketplace with `/plugin marketplace add ej-rarus/work-with-tony` (Claude Code) or `codex plugin marketplace add ej-rarus/work-with-tony` (Codex).
+> **English:** A personal catalog of Claude Code and Codex plugins by Tony (Eunjae Lee): LinkedIn publishing, Instagram carousels, PRD review, file explanations with practice lessons, Suno form prep, plugin releases, and everyday work follow-through. Every plugin has its own English README under `plugins/<name>/`. Add the marketplace with `/plugin marketplace add ej-rarus/work-with-tony` (Claude Code) or `codex plugin marketplace add ej-rarus/work-with-tony` (Codex).
 
 ## 한눈에 보기
 
 | 플러그인 | 하는 일 | 이럴 때 쓰세요 |
 |---|---|---|
 | [**linkedin-post**](plugins/linkedin-post/) | 대화로 LinkedIn 글을 다듬고 공식 API로 내 프로필에 발행 | 매일 글을 올리는데 초안 작성과 게시가 번거로울 때 |
+| [**instagram-carousel**](plugins/instagram-carousel/) | 메모나 주제로 인스타 카드뉴스를 기획하고, 수정 가능한 HTML과 1080×1350 PNG로 만들기 | 교육용·정보형 카드뉴스를 일정한 디자인으로 꾸준히 만들고 싶을 때 |
+| [**explain-this**](plugins/explain-this/) | 로컬 Markdown·HTML·JSON 파일을 쉬운 말로 설명하고, 원하면 오프라인 연습 화면까지 만들기 | 받은 설정 파일이나 문서가 무슨 뜻인지 직접 만져 보며 이해하고 싶을 때 |
 | [**prd-check**](plugins/prd-check/) | Markdown PRD를 팀 표준 양식과 비교해 줄 번호가 달린 점검표 작성 | PRD를 리뷰에 올리기 전에 빠진 절이나 형식 오류를 잡고 싶을 때 |
 | [**suno-music**](plugins/suno-music/) | 확정한 가사와 스타일을 Suno Advanced 입력창에 채워 두기 (생성 버튼은 누르지 않음) | 가사를 여러 번 옮겨 붙이다 실수하는 게 싫을 때 |
 | [**plugin-release**](plugins/plugin-release/) | 플러그인 패키지 검증, 마켓플레이스 정보 동기화, 릴리스 커밋과 푸시 확인 | 직접 만든 플러그인의 버전을 올리고 배포할 때 |
@@ -68,6 +70,8 @@ codex plugin add linkedin-post@work-with-tony
 | 플러그인 | 처음 한 번 해 둘 일 |
 |---|---|
 | linkedin-post | 무료 LinkedIn 개발자 앱을 만들고 로그인 (약 5분, 첫 실행 때 스킬이 단계별로 안내) |
+| instagram-carousel | PNG로 내보낼 때만 Chrome 또는 Chromium 필요 |
+| explain-this | 없음 |
 | prd-check | 팀 PRD 양식 파일 경로를 `~/.prd-check/config.json`에 등록 |
 | suno-music | 호스트의 브라우저 제어 기능을 켜고, 그 브라우저에서 Suno에 로그인 |
 | plugin-release | 없음 |
@@ -92,6 +96,38 @@ codex plugin add linkedin-post@work-with-tony
 설치: `/plugin install linkedin-post@work-with-tony` (Claude Code) · `codex plugin add linkedin-post@work-with-tony` (Codex)
 
 [자세히 보기](plugins/linkedin-post/)
+
+### instagram-carousel: 카드뉴스 기획부터 PNG까지
+
+```text
+/instagram-carousel:create MD 파일이 뭔지 PM 초보자용 7장 카드뉴스로 기획해줘. 파일은 만들지 마.
+/instagram-carousel:create 이 메모를 Tony Editorial Blue HTML 카드뉴스와 PNG로 만들어줘.
+```
+
+- 주제, 붙여 넣은 메모, 기존 초안, 로컬 Markdown 파일 중 무엇이든 받아 슬라이드 구성을 먼저 제안합니다. 파일 없이 기획만 할 수도 있어요.
+- 만들기를 요청하면 `deck.json`(내용), 미리보기 HTML, 캡션, 대체 텍스트가 든 프로젝트 폴더를 만들고, 정확히 1080×1350 크기의 PNG와 한눈에 보는 목록 이미지를 뽑습니다.
+- 표지, 설명, 비교, 체크리스트, 실습, 한 문장, 마무리까지 7가지 레이아웃과 2가지 디자인(사진 중심의 Editorial Blue, 글자 중심의 Digital Field Notes)을 씁니다.
+- 글자는 이미지가 아닌 실제 텍스트라서 `deck.json`만 고치고 다시 만들면 됩니다.
+- **인스타그램에 게시하지 않습니다.** 로그인, 업로드, 스톡 이미지 다운로드도 하지 않고 모든 파일은 내 컴퓨터에만 만들어집니다.
+
+설치: `/plugin install instagram-carousel@work-with-tony` (Claude Code) · `codex plugin add instagram-carousel@work-with-tony` (Codex)
+
+[자세히 보기](plugins/instagram-carousel/)
+
+### explain-this: 파일을 읽고, 직접 만져 보며 이해하기
+
+```text
+/explain-this:explain /absolute/path/to/notes.md 파일 내용만 쉽게 설명해줘. 파일은 만들지 마.
+/explain-this:explain /absolute/path/to/config.json 을 설명하고 연습 화면도 만들어줘.
+```
+
+- 파일의 실제 문장을 짚어 가며 쉬운 말로 설명합니다. 대상은 128KB 이하의 `.md`, `.html`, `.json` 파일이에요.
+- 연습을 요청하면 작은 예제를 고쳐 보면서 바뀌기 전과 후를 나란히 비교하는 오프라인 학습 페이지를 새 폴더에 만듭니다. 계정, 서버, 네트워크 없이 브라우저에서 바로 열립니다.
+- **원본 파일은 바꾸거나 복사하지 않습니다.** 파일 안의 코드를 실행하거나 링크를 열지도 않고, 파일 내용은 지시가 아닌 데이터로만 다룹니다.
+
+설치: `/plugin install explain-this@work-with-tony` (Claude Code) · `codex plugin add explain-this@work-with-tony` (Codex)
+
+[자세히 보기](plugins/explain-this/)
 
 ### prd-check: 리뷰 전에 PRD 형식 점검
 
