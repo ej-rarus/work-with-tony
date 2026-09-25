@@ -1,0 +1,20 @@
+{
+  "name": "hwp-form",
+  "version": "0.1.0",
+  "description": "Fill Korean HWP/HWPX application forms from your saved profile and materials into a new HWPX copy, leaving signatures, consent, and gaps on a checklist.",
+  "author": { "name": "Tony (Eunjae Lee)" },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["hwp", "hwpx", "hancom", "forms", "korean", "government"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "HWP Form",
+    "shortDescription": "한글(HWP) 신청서를 프로필과 자료로 채우기",
+    "longDescription": "Read an HWPX form, map each answer cell, fill profile facts and drafts from your material into a new HWPX copy with read-back verification, and list what is left for you: choices, signatures, consent, attachments. Never touches the original.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": ["$hwp-form:fill ~/Downloads/참가신청서.hwpx", "$hwp-form:fill 이 신청서를 사업계획서 초안으로 채워줘"]
+  }
+}

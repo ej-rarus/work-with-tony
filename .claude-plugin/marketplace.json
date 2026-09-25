@@ -78,6 +78,15 @@
       "author": {
         "name": "Tony (Eunjae Lee)"
       }
+    },
+    {
+      "name": "hwp-form",
+      "description": "Fill Korean HWP/HWPX application forms from your saved profile and materials into a new HWPX copy, leaving signatures, consent, and gaps on a checklist.",
+      "version": "0.1.0",
+      "source": "./plugins/hwp-form",
+      "author": {
+        "name": "Tony (Eunjae Lee)"
+      }
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "name": "hwp-form",
+  "version": "0.1.0",
+  "description": "Fill Korean HWP/HWPX application forms from your saved profile and materials into a new HWPX copy, leaving signatures, consent, and gaps on a checklist.",
+  "author": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["hwp", "hwpx", "hancom", "forms", "korean", "government"]
+}
