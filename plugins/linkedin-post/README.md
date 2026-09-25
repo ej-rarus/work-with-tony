@@ -77,6 +77,16 @@ LinkedIn does not let a personal developer app read likes or comments, so you pa
 
 The skill writes a `stats:` block into the post's file under `published/` and appends the comments under `## Reactions (date)`. Later drafts read those reactions as material, and a comment with a question or a disagreement becomes a suggested follow-up topic.
 
+### Stats from the analytics export
+
+LinkedIn does not let a personal app read post analytics, but its own export has them. Download it from Analytics > Posts > Export (choose the past 365 days) and run:
+
+```
+/linkedin-post:stats ~/Downloads/AggregateAnalytics_….xlsx
+```
+
+(`$linkedin-post:stats` in Codex.) It matches each post in the export to your file in `published/` by post id, records `impressions` and `engagements` (reactions + comments + clicks, kept apart from hand-recorded likes) under `stats:`, and then compares post structures and types by median and mean impressions and engagement rate. Counts are never lowered, and a shorter export skips posts published before its range because their numbers would be partial. Posts younger than three days are left out of the comparison, and groups with fewer than three posts are marked as small. When a pattern is strong enough, it offers one rule for your `publish-check.md`, which it adds only if you agree.
+
 ### Series
 
 Add `series: <slug>` when publishing a post that continues an earlier one. The next time a topic fits that series, the skill reads every post in it before drafting so the reference back is deliberate.
@@ -107,13 +117,15 @@ node scripts/publish.mjs body.md --dry-run  # show escaped request, no API call
 node scripts/record.mjs published/2026-09-10-post.md --likes 23 --comments 4 --reactions-file comments.md
 node scripts/doctor.mjs                     # health check, prints one JSON line
 node scripts/doctor.mjs --offline           # same, without network calls
+node scripts/stats.mjs import export.xlsx [--write]  # match the analytics export to published/
+node scripts/stats.mjs report                  # compare structures and types
 ```
 
-Exit codes for `auth.mjs` and `publish.mjs`: 0 success, 1 LinkedIn API error, 2 configuration or validation error. For `record.mjs` (no API call): 0 success, 1 usage error, 2 file or frontmatter problem. For `doctor.mjs`: 0 no failed check (warnings allowed), 1 at least one failed check, 2 bad arguments.
+Exit codes for `auth.mjs` and `publish.mjs`: 0 success, 1 LinkedIn API error, 2 configuration or validation error. For `record.mjs` (no API call): 0 success, 1 usage error, 2 file or frontmatter problem. For `doctor.mjs`: 0 no failed check (warnings allowed), 1 at least one failed check, 2 bad arguments. For `stats.mjs`: 0 success, 1 usage error, 2 file or data problem.
 
 ## Out of scope (for now)
 
-Images and documents, scheduled posts, company pages, editing or deleting posts, analytics.
+Images and documents, scheduled posts, company pages, editing or deleting posts, reading analytics through the API.
 
 ## Development
 

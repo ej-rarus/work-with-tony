@@ -140,3 +140,17 @@ test("doctor skill has frontmatter, runs doctor.mjs, and never prints secrets", 
 test("post skill points at the doctor when auth or API version fails", () => {
   assert.ok(readText("skills/post/SKILL.md").includes("scripts/doctor.mjs"));
 });
+
+test("stats skill imports the analytics export, reports honestly, and asks before editing personal files", () => {
+  const skill = readText("skills/stats/SKILL.md");
+  assert.match(skill, /^---\nname: stats\ndescription: .+\n---\n/);
+  for (const needle of ["/linkedin-post:stats", "$linkedin-post:stats", "CLAUDE_PLUGIN_ROOT", "scripts/stats.mjs", "--write", "AggregateAnalytics", "engagements", "median", "small", "publish-check.md", "LINKEDIN_POST_HOME"]) {
+    assert.ok(skill.includes(needle), `stats SKILL.md missing ${needle}`);
+  }
+  assert.match(skill, /Never edit `publish-check.md`/);
+  assert.match(skill, /Counts are never lowered/);
+});
+
+test("post skill points to the stats skill for bulk numbers", () => {
+  assert.ok(readText("skills/post/SKILL.md").includes("/linkedin-post:stats"));
+});

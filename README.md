@@ -91,6 +91,7 @@ codex plugin add linkedin-post@work-with-tony
 /linkedin-post:post 이번 주 Claude Code 스킬 만들면서 배운 점
 /linkedin-post:post ~/notes/retro.md
 /linkedin-post:doctor
+/linkedin-post:stats ~/Downloads/AggregateAnalytics_….xlsx
 ```
 
 - 주제 한 줄이나 메모 파일만 주면 초안을 씁니다. 글자 수, "더 보기" 전에 보이는 두 줄, 발행 전 점검 결과를 함께 보여줍니다.
@@ -98,6 +99,7 @@ codex plugin add linkedin-post@work-with-tony
 - **"올려", "발행"처럼 분명히 말하기 전에는 절대 게시하지 않습니다.**
 - 좋아요, 댓글 수를 붙여 넣으면 게시물 기록에 저장되고, 다음 글을 쓸 때 참고 자료로 씁니다.
 - `/linkedin-post:doctor`는 로그인이 만료되기 전이나 LinkedIn API 버전이 바뀌기 전에 미리 알려줍니다. 새 버전으로 바꿀 방법도 함께 알려줍니다.
+- `/linkedin-post:stats`에 LinkedIn 애널리틱스에서 내보낸 xlsx를 주면 글마다 노출수·참여수를 기록하고, 글 구조·유형별로 어떤 글이 잘 읽히는지 비교해 줍니다. 근거가 충분할 때만 발행 전 점검 기준에 넣을 규칙을 제안해요.
 
 설치: `/plugin install linkedin-post@work-with-tony` (Claude Code) · `codex plugin add linkedin-post@work-with-tony` (Codex)
 

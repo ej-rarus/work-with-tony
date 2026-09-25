@@ -116,7 +116,7 @@ Use `node "${CLAUDE_PLUGIN_ROOT}/scripts/publish.mjs" "<draft path>" --dry-run` 
 
 ## 4. Record reactions
 
-LinkedIn does not let a personal developer app read reactions or comments (those endpoints need the partner-only Community Management product), so reactions are recorded by hand. Trigger on "반응 기록", "댓글 왔어", "record reactions", or when the user pastes like/comment counts or comment text without another request.
+LinkedIn does not let a personal developer app read reactions or comments (those endpoints need the partner-only Community Management product), so reactions are recorded by hand. For impressions and engagements across all posts at once, use `/linkedin-post:stats` with the analytics export instead of recording them one by one. Trigger on "반응 기록", "댓글 왔어", "record reactions", or when the user pastes like/comment counts or comment text without another request.
 
 1. Identify the post. Default to the most recent file in `published/`; if the user names a topic or date, match that; if ambiguous, ask once.
 2. Extract the counters the user gave (likes, comments, reposts, impressions). Missing counters stay as they were.
