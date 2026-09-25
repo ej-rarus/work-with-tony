@@ -1,0 +1,20 @@
+{
+  "name": "repurpose",
+  "version": "0.1.0",
+  "description": "Turn one source into a LinkedIn post draft and an Instagram carousel plan that share one confirmed message, then hand each to its channel plugin.",
+  "author": { "name": "Tony (Eunjae Lee)" },
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["content", "linkedin", "instagram", "carousel", "writing"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Repurpose",
+    "shortDescription": "글 하나로 LinkedIn 글과 인스타 캐러셀을 함께",
+    "longDescription": "Find one confirmed message in a topic, notes, or a file, save it as a brief, and draft a LinkedIn post and an Instagram carousel plan from it through the linkedin-post and instagram-carousel plugins. Never publishes or exports by itself.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Creative",
+    "capabilities": ["Interactive", "Write"],
+    "defaultPrompt": ["$repurpose:make ~/notes/retro.md", "$repurpose:make 이번 주 배운 점"]
+  }
+}

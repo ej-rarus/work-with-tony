@@ -1,0 +1,9 @@
+{
+  "name": "repurpose",
+  "version": "0.1.0",
+  "description": "Turn one source into a LinkedIn post draft and an Instagram carousel plan that share one confirmed message, then hand each to its channel plugin.",
+  "author": { "name": "Tony (Eunjae Lee)", "url": "https://github.com/ej-rarus" },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": ["content", "linkedin", "instagram", "carousel", "writing"]
+}

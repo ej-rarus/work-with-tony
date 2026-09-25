@@ -69,6 +69,15 @@
       "author": {
         "name": "Tony (Eunjae Lee)"
       }
+    },
+    {
+      "name": "repurpose",
+      "description": "Turn one source into a LinkedIn post draft and an Instagram carousel plan that share one confirmed message, then hand each to its channel plugin.",
+      "version": "0.1.0",
+      "source": "./plugins/repurpose",
+      "author": {
+        "name": "Tony (Eunjae Lee)"
+      }
     }
   ]
 }

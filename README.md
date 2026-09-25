@@ -2,7 +2,7 @@
 
 일하면서 반복되는 일을 대화 한 줄로 끝내려고 만든 개인 플러그인 모음입니다. **Claude Code**와 **Codex** 양쪽에서 같은 플러그인을 그대로 쓸 수 있습니다.
 
-> **English:** A personal catalog of Claude Code and Codex plugins by Tony (Eunjae Lee): LinkedIn publishing, Instagram carousels, PRD review, file explanations with practice lessons, Suno form prep, plugin releases, and everyday work follow-through. Every plugin has its own English README under `plugins/<name>/`. Add the marketplace with `/plugin marketplace add ej-rarus/work-with-tony` (Claude Code) or `codex plugin marketplace add ej-rarus/work-with-tony` (Codex).
+> **English:** A personal catalog of Claude Code and Codex plugins by Tony (Eunjae Lee): LinkedIn publishing, Instagram carousels, one-source repurposing into both, PRD review, file explanations with practice lessons, Suno form prep, plugin releases, and everyday work follow-through. Every plugin has its own English README under `plugins/<name>/`. Add the marketplace with `/plugin marketplace add ej-rarus/work-with-tony` (Claude Code) or `codex plugin marketplace add ej-rarus/work-with-tony` (Codex).
 
 ## 한눈에 보기
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [**linkedin-post**](plugins/linkedin-post/) | 대화로 LinkedIn 글을 다듬고 공식 API로 내 프로필에 발행 | 매일 글을 올리는데 초안 작성과 게시가 번거로울 때 |
 | [**instagram-carousel**](plugins/instagram-carousel/) | 메모나 주제로 인스타 카드뉴스를 기획하고, 수정 가능한 HTML과 1080×1350 PNG로 만들기 | 교육용·정보형 카드뉴스를 일정한 디자인으로 꾸준히 만들고 싶을 때 |
+| [**repurpose**](plugins/repurpose/) | 글 하나에서 핵심 메시지를 확정하고, LinkedIn 글 초안과 인스타 캐러셀 기획을 함께 만들기 | 회고나 메모 하나를 두 채널에 따로 쓰느라 시간을 두 번 쓰기 싫을 때 |
 | [**explain-this**](plugins/explain-this/) | 로컬 Markdown·HTML·JSON 파일을 쉬운 말로 설명하고, 원하면 오프라인 연습 화면까지 만들기 | 받은 설정 파일이나 문서가 무슨 뜻인지 직접 만져 보며 이해하고 싶을 때 |
 | [**prd-check**](plugins/prd-check/) | Markdown PRD를 팀 표준 양식과 비교해 줄 번호가 달린 점검표 작성 | PRD를 리뷰에 올리기 전에 빠진 절이나 형식 오류를 잡고 싶을 때 |
 | [**suno-music**](plugins/suno-music/) | 확정한 가사와 스타일을 Suno Advanced 입력창에 채워 두기 (생성 버튼은 누르지 않음) | 가사를 여러 번 옮겨 붙이다 실수하는 게 싫을 때 |
@@ -71,6 +72,7 @@ codex plugin add linkedin-post@work-with-tony
 |---|---|
 | linkedin-post | 무료 LinkedIn 개발자 앱을 만들고 로그인 (약 5분, 첫 실행 때 스킬이 단계별로 안내) |
 | instagram-carousel | PNG로 내보낼 때만 Chrome 또는 Chromium 필요 |
+| repurpose | 없음 (게시와 PNG 제작까지 하려면 linkedin-post, instagram-carousel도 설치) |
 | explain-this | 없음 |
 | prd-check | 팀 PRD 양식 파일 경로를 `~/.prd-check/config.json`에 등록 |
 | suno-music | 호스트의 브라우저 제어 기능을 켜고, 그 브라우저에서 Suno에 로그인 |
@@ -113,6 +115,22 @@ codex plugin add linkedin-post@work-with-tony
 설치: `/plugin install instagram-carousel@work-with-tony` (Claude Code) · `codex plugin add instagram-carousel@work-with-tony` (Codex)
 
 [자세히 보기](plugins/instagram-carousel/)
+
+### repurpose: 글 하나로 LinkedIn과 캐러셀을 함께
+
+```text
+/repurpose:make ~/notes/retro.md
+/repurpose:make 이번 주 PRD 표준 정하면서 배운 점
+```
+
+- 먼저 **핵심 시트**를 보여줍니다. 주장 한 문장, 대상 독자, 원문에서 인용한 근거 3~5개, 확인 필요 항목, 채널별 각도가 들어가요. 확인하기 전에는 초안을 쓰지 않습니다.
+- 확인한 시트는 `~/.repurpose/briefs/`에 브리프로 저장되고, 두 채널 모두 이 브리프만 보고 씁니다. 그래서 채널마다 사실이 달라지지 않아요.
+- LinkedIn 초안은 linkedin-post가, 캐러셀 기획은 instagram-carousel이 각자의 규칙대로 만들고, 마지막에 같은 메시지인지, 브리프에 없는 사실이 들어가지 않았는지 대조합니다.
+- **스스로 게시하거나 PNG를 만들지 않습니다.** "올려"나 "캐러셀 만들어줘"라고 하면 각 플러그인이 자기 확인 절차대로 진행해요.
+
+설치: `/plugin install repurpose@work-with-tony` (Claude Code) · `codex plugin add repurpose@work-with-tony` (Codex)
+
+[자세히 보기](plugins/repurpose/)
 
 ### explain-this: 파일을 읽고, 직접 만져 보며 이해하기
 

@@ -87,6 +87,18 @@
         "authentication": "ON_INSTALL"
       },
       "category": "Creative"
+    },
+    {
+      "name": "repurpose",
+      "source": {
+        "source": "local",
+        "path": "./plugins/repurpose"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Creative"
     }
   ]
 }
