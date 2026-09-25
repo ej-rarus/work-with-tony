@@ -2,6 +2,20 @@
 
 Fill Korean HWP/HWPX application forms (지원사업 신청서, 참가신청서, 동의서) from a saved profile and the materials you point to. The result is a new HWPX copy plus a checklist of what is still yours to do. The original form is never modified.
 
+## In short
+
+Give it a blank application form; get back a filled copy and a short list of what only you can do.
+
+## Example
+
+Applying to a local start-up support programme with its `.hwpx` application form:
+
+1. You say: `/hwp-form:fill ~/Downloads/신청서.hwpx 사업계획은 ~/notes/plan.md 참고해`.
+2. It reads the form and shows a map before writing anything: name, birth date, address, phone, career and certificates come from your profile; 창업 동기, item overview and marketing plan are drafted from `plan.md`; □개인/□단체 and 지원경로 are asked; signature, (인), consent and pledge boxes, and the submission date are left blank.
+3. You confirm or correct the map. It writes `신청서-작성본-20260925.hwpx` next to the original.
+4. It ends with what is left, for example: sign in 2 places, tick 1 consent box, attach 2 documents, delete the 유의사항 box before submitting.
+5. You open the copy in Hancom Office, review, sign, and submit.
+
 ## What it fills and what it leaves
 
 | Group | Examples | What happens |
