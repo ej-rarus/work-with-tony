@@ -18,7 +18,7 @@
     {
       "name": "prd-check",
       "description": "Check a Markdown PRD against your team's template and rules, and write a line-numbered report of what to fix.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./plugins/prd-check",
       "author": {
         "name": "Tony (Eunjae Lee)"

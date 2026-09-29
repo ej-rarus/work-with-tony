@@ -7,7 +7,7 @@ if (Number(process.versions.node.split(".")[0]) < MIN_NODE_MAJOR) {
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, extname, join } from "node:path";
-import { pathToFileURL } from "node:url";
+import { isEntry } from "./lib/entry.mjs";
 import { parseMarkdown } from "./lib/markdown.mjs";
 import { extractExpectations } from "./lib/template.mjs";
 import { RulesError, loadRules } from "./lib/rules.mjs";
@@ -107,6 +107,6 @@ export function runCheck(argv, deps = {}) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntry(import.meta.url)) {
   process.exitCode = runCheck(process.argv.slice(2));
 }
