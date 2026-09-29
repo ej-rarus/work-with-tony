@@ -9,7 +9,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { extname } from "node:path";
 import { isEntry } from "./lib/entry.mjs";
 import { ConfigError, getHome, loadToken, tokenStatus } from "./lib/config.mjs";
-import { LinkedInApiError, createClient } from "./lib/linkedin-api.mjs";
+import { LinkedInApiError, MAX_POST_IMAGES, createClient } from "./lib/linkedin-api.mjs";
 import { redact } from "./lib/redact.mjs";
 import { MAX_POST_LENGTH, countChars, escapeCommentary } from "./lib/text-format.mjs";
 
@@ -20,7 +20,7 @@ const MAX_ALT_LENGTH = 4086;
 const IMAGE_TYPES = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif" };
 
 const HINTS = {
-  BAD_ARGS: "Usage: node scripts/publish.mjs <body-file> [--visibility public|connections] [--image <png|jpg|gif>] [--alt <text>] [--dry-run]",
+  BAD_ARGS: "Usage: node scripts/publish.mjs <body-file> [--visibility public|connections] [--image <png|jpg|gif> [--alt <text>]]... [--dry-run]",
   FILE_NOT_FOUND: "Check the draft path passed to publish.mjs.",
   EMPTY_BODY: "The draft file is empty. Write the post before publishing.",
   TOO_LONG: `LinkedIn posts are limited to ${MAX_POST_LENGTH} characters. Shorten the draft.`,
@@ -29,6 +29,8 @@ const HINTS = {
   IMAGE_TYPE: "Only .png, .jpg, .jpeg and .gif images can be attached.",
   IMAGE_TOO_LARGE: "Images must be 10 MB or smaller. Resize or re-export the image.",
   ALT_TOO_LONG: `Alt text must be ${MAX_ALT_LENGTH} characters or fewer.`,
+  TOO_MANY_IMAGES: `A post can carry at most ${MAX_POST_IMAGES} images. Drop some --image flags.`,
+  ALT_WITHOUT_IMAGE: "Each --alt belongs to the --image in the same position (1st --alt to 1st --image). Give no more --alt values than --image values.",
 };
 
 export class PublishError extends Error {
@@ -44,15 +46,14 @@ export function parseArgs(argv) {
   const positional = [];
   let visibility = "PUBLIC";
   let dryRun = false;
-  let image = null;
-  let alt = "";
+  const imagePaths = [];
+  const alts = [];
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--dry-run") { dryRun = true; continue; }
     if (arg === "--image" || arg === "--alt") {
       if (argv[i + 1] === undefined || argv[i + 1].startsWith("--")) throw new PublishError("BAD_ARGS", `${arg} needs a value.`);
-      if (arg === "--image") image = argv[i + 1];
-      else alt = argv[i + 1];
+      (arg === "--image" ? imagePaths : alts).push(argv[i + 1]);
       i += 1;
       continue;
     }
@@ -67,7 +68,10 @@ export function parseArgs(argv) {
     positional.push(arg);
   }
   if (positional.length !== 1) throw new PublishError("BAD_ARGS", "Exactly one body file is required.");
-  return { file: positional[0], visibility, dryRun, image, alt };
+  if (imagePaths.length > MAX_POST_IMAGES) throw new PublishError("TOO_MANY_IMAGES", `Got ${imagePaths.length} images.`);
+  if (alts.length > imagePaths.length) throw new PublishError("ALT_WITHOUT_IMAGE", `Got ${alts.length} --alt values for ${imagePaths.length} image(s).`);
+  const images = imagePaths.map((path, i) => ({ path, alt: alts[i] ?? "" }));
+  return { file: positional[0], visibility, dryRun, images };
 }
 
 export function validateBody(text) {
@@ -91,6 +95,12 @@ export function readImage(path, alt) {
   if (size > MAX_IMAGE_BYTES) throw new PublishError("IMAGE_TOO_LARGE", `${path} is ${size} bytes.`);
   if (countChars(alt) > MAX_ALT_LENGTH) throw new PublishError("ALT_TOO_LONG", `Alt text has ${countChars(alt)} characters.`);
   return { path, bytes: size, contentType, altText: alt, data: readFileSync(path) };
+}
+
+// Output keeps the single-image key `image`; two or more use `images`.
+function imageField(items) {
+  if (items.length === 0) return {};
+  return items.length === 1 ? { image: items[0] } : { images: items };
 }
 
 function loadValidToken(home, now, stderr) {
@@ -129,8 +139,9 @@ export async function runPublish(argv, deps = {}) {
   try {
     const args = parseArgs(argv);
     const body = readBody(args.file);
-    const image = args.image ? readImage(args.image, args.alt) : null;
-    const imageSummary = image ? { path: image.path, bytes: image.bytes, contentType: image.contentType, altText: image.altText } : undefined;
+    // Read and validate every image before any network call.
+    const images = args.images.map(({ path, alt }) => readImage(path, alt));
+    const summaries = images.map(({ path, bytes, contentType, altText }) => ({ path, bytes, contentType, altText }));
     const token = loadValidToken(getHome(env), now, stderr);
     secrets.push(token.accessToken);
     const commentary = escapeCommentary(body);
@@ -139,19 +150,23 @@ export async function runPublish(argv, deps = {}) {
 
     if (args.dryRun) {
       const escapedChars = countChars(commentary);
-      stdout(JSON.stringify({ ok: true, dryRun: true, request, chars, escapedChars, ...(imageSummary ? { image: imageSummary } : {}) }));
+      stdout(JSON.stringify({ ok: true, dryRun: true, request, chars, escapedChars, ...imageField(summaries) }));
       return 0;
     }
 
     const client = createClient({ accessToken: token.accessToken, fetchImpl, sleep });
-    const imageUrn = image ? await client.uploadImage({ ownerUrn: token.personUrn, bytes: image.data }) : null;
+    // Upload one at a time; any failure throws before the post is created.
+    const urns = [];
+    for (const image of images) {
+      urns.push(await client.uploadImage({ ownerUrn: token.personUrn, bytes: image.data }));
+    }
     const { id, url } = await client.createPost({
       authorUrn: token.personUrn,
       commentary,
       visibility: args.visibility,
-      image: imageUrn ? { id: imageUrn, altText: image.altText } : undefined,
+      images: urns.map((urn, i) => ({ id: urn, altText: images[i].altText })),
     });
-    stdout(JSON.stringify({ ok: true, id, url, chars, ...(imageUrn ? { image: imageUrn } : {}) }));
+    stdout(JSON.stringify({ ok: true, id, url, chars, ...imageField(urns) }));
     return 0;
   } catch (error) {
     stdout(JSON.stringify(failure(error, secrets)));

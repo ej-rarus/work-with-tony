@@ -10,6 +10,17 @@ export const API_VERSION = resolveApiVersion().version;
 export const POSTS_URL = "https://api.linkedin.com/rest/posts";
 export const USERINFO_URL = "https://api.linkedin.com/v2/userinfo";
 export const IMAGES_INIT_URL = "https://api.linkedin.com/rest/images?action=initializeUpload";
+// MultiImage posts take 2 to 20 images (Posts API, content.multiImage).
+export const MAX_POST_IMAGES = 20;
+
+// One image -> content.media (unchanged single-image shape). Two or more ->
+// content.multiImage.images, where altText is optional and omitted when empty.
+function imageContent(images) {
+  if (images.length === 0) return undefined;
+  if (images.length > MAX_POST_IMAGES) throw new RangeError(`A post can carry at most ${MAX_POST_IMAGES} images, got ${images.length}.`);
+  if (images.length === 1) return { media: { id: images[0].id, altText: images[0].altText } };
+  return { multiImage: { images: images.map(({ id, altText }) => (altText ? { id, altText } : { id })) } };
+}
 
 const ERROR_TABLE = {
   UNAUTHORIZED: "Access token is invalid or expired. Run `node scripts/auth.mjs` to sign in again.",
@@ -145,7 +156,9 @@ export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSl
     return value.image;
   }
 
-  async function createPost({ authorUrn, commentary, visibility, image }) {
+  // Pass `image` for one image or `images` for several; `images` wins when both are given.
+  async function createPost({ authorUrn, commentary, visibility, image, images }) {
+    const content = imageContent(images ?? (image ? [image] : []));
     const base = {
       author: authorUrn,
       commentary,
@@ -154,7 +167,7 @@ export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSl
       lifecycleState: "PUBLISHED",
       isReshareDisabledByAuthor: false,
     };
-    const body = image ? { ...base, content: { media: { id: image.id, altText: image.altText } } } : base;
+    const body = content ? { ...base, content } : base;
     const res = await request(
       POSTS_URL,
       {

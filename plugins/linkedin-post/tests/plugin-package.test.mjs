@@ -163,3 +163,12 @@ test("SKILL.md documents image attachment with a privacy check before publishing
   assert.match(skill, /Never attach an image you have not looked at/);
   assert.doesNotMatch(skill, /Never publish images/);
 });
+
+test("docs describe multiple images (up to 20) and a privacy check for every image", () => {
+  const skill = readText("skills/post/SKILL.md");
+  const readme = readText("README.md");
+  assert.match(skill, /up to 20 images/i);
+  assert.match(skill, /every image/i);
+  assert.match(readme, /up to 20 images/i);
+  assert.doesNotMatch(readme, /multiple images, scheduled posts/);
+});

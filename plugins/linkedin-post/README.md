@@ -64,11 +64,19 @@ Each draft also picks one of six post structures (`scene`, `rules`, `questions`,
 
 ### Images
 
-One image (png, jpg/jpeg or gif, up to 10 MB) can go with a post. Hand it to the skill with the topic; before the image is used, the skill opens it, lists anything that identifies a private person (names, email, phone, address, order numbers, faces), and offers a redacted copy. It publishes only after you confirm. The script uploads the image through LinkedIn's Images API and attaches it with alt text:
+One image, or up to 20 images, can go with a post (png, jpg/jpeg or gif, each up to 10 MB). Hand them to the skill with the topic; before any image is used, the skill opens each one, lists anything that identifies a private person (names, email, phone, address, order numbers, faces), and offers a redacted copy. It publishes only after you confirm. The script uploads each image through LinkedIn's Images API and attaches it with alt text:
 
 ```
 node scripts/publish.mjs draft.md --image receipt-redacted.png --alt "주문 영수증, 개인정보는 가림"
 ```
+
+For several images, repeat `--image` (and optionally `--alt`) once per image. The Nth `--alt` goes with the Nth `--image`, and two or more images are posted as one multi-image post in that order:
+
+```
+node scripts/publish.mjs draft.md --image before.png --alt "정리 전 책상" --image after.png --alt "정리 후 책상"
+```
+
+Every image is checked (type, size, alt length, at most 20 images, no more `--alt` than `--image`) before anything is sent, and if any upload fails, no post is created.
 
 ### Pre-publish check
 
@@ -133,7 +141,7 @@ Exit codes for `auth.mjs` and `publish.mjs`: 0 success, 1 LinkedIn API error, 2 
 
 ## Out of scope (for now)
 
-Documents and videos, multiple images, scheduled posts, company pages, editing or deleting posts, reading analytics through the API.
+Documents and videos, scheduled posts, company pages, editing or deleting posts, reading analytics through the API.
 
 ## Development
 

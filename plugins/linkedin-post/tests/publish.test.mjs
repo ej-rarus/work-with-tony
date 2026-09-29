@@ -3,6 +3,7 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 import { saveToken } from "../scripts/lib/config.mjs";
+import { IMAGES_INIT_URL, POSTS_URL } from "../scripts/lib/linkedin-api.mjs";
 import { PublishError, parseArgs, runPublish, validateBody } from "../scripts/publish.mjs";
 import { makeTempHome } from "./helpers.mjs";
 
@@ -27,8 +28,8 @@ function setup({ token = { accessToken: "tok", expiresAt: NOW + 30 * DAY, person
 }
 
 test("parseArgs reads file, visibility and dry-run", () => {
-  assert.deepEqual(parseArgs(["a.md"]), { file: "a.md", visibility: "PUBLIC", dryRun: false, image: null, alt: "" });
-  assert.deepEqual(parseArgs(["a.md", "--visibility", "connections", "--dry-run"]), { file: "a.md", visibility: "CONNECTIONS", dryRun: true, image: null, alt: "" });
+  assert.deepEqual(parseArgs(["a.md"]), { file: "a.md", visibility: "PUBLIC", dryRun: false, images: [] });
+  assert.deepEqual(parseArgs(["a.md", "--visibility", "connections", "--dry-run"]), { file: "a.md", visibility: "CONNECTIONS", dryRun: true, images: [] });
   assert.throws(() => parseArgs([]), (e) => e instanceof PublishError && e.code === "BAD_ARGS");
   assert.throws(() => parseArgs(["a.md", "--visibility", "everyone"]), (e) => e.code === "BAD_ARGS");
 });
@@ -123,7 +124,7 @@ function withImage(s, name = "shot.png", bytes = PNG) {
 }
 
 test("parseArgs reads --image and --alt, and requires a value for each", () => {
-  assert.deepEqual(parseArgs(["a.md", "--image", "x.png", "--alt", "receipt"]), { file: "a.md", visibility: "PUBLIC", dryRun: false, image: "x.png", alt: "receipt" });
+  assert.deepEqual(parseArgs(["a.md", "--image", "x.png", "--alt", "receipt"]), { file: "a.md", visibility: "PUBLIC", dryRun: false, images: [{ path: "x.png", alt: "receipt" }] });
   assert.throws(() => parseArgs(["a.md", "--image"]), (e) => e.code === "BAD_ARGS");
   assert.throws(() => parseArgs(["a.md", "--alt"]), (e) => e.code === "BAD_ARGS");
 });
@@ -211,5 +212,125 @@ test(".jpeg images are accepted as image/jpeg", async () => {
     const img = withImage(s, "photo.JPEG");
     assert.equal(await runPublish([s.file, "--image", img, "--dry-run"], s.deps), 0);
     assert.equal(s.lastJson().image.contentType, "image/jpeg");
+  } finally { s.cleanup(); }
+});
+
+// ---- multiple images ----
+
+const initOk = (urn) => new Response(JSON.stringify({ value: { uploadUrl: `https://upload.example/${urn}`, image: urn } }), { status: 200 });
+
+test("parseArgs pairs repeated --alt values with --image values by position", () => {
+  const args = parseArgs(["a.md", "--image", "1.png", "--alt", "first", "--image", "2.png", "--alt", "second", "--image", "3.png"]);
+  assert.deepEqual(args.images, [{ path: "1.png", alt: "first" }, { path: "2.png", alt: "second" }, { path: "3.png", alt: "" }]);
+});
+
+test("parseArgs pairs alts positionally even when all --alt flags come after the images", () => {
+  const args = parseArgs(["a.md", "--image", "1.png", "--image", "2.png", "--alt", "one", "--alt", "two"]);
+  assert.deepEqual(args.images, [{ path: "1.png", alt: "one" }, { path: "2.png", alt: "two" }]);
+});
+
+test("parseArgs rejects more --alt values than --image values", () => {
+  assert.throws(() => parseArgs(["a.md", "--image", "1.png", "--alt", "a", "--alt", "b"]), (e) => e instanceof PublishError && e.code === "ALT_WITHOUT_IMAGE" && Boolean(e.hint));
+  assert.throws(() => parseArgs(["a.md", "--alt", "orphan"]), (e) => e.code === "ALT_WITHOUT_IMAGE");
+});
+
+test("parseArgs accepts 20 images and rejects 21 with TOO_MANY_IMAGES", () => {
+  const flags = (n) => Array.from({ length: n }, (_, i) => ["--image", `${i}.png`]).flat();
+  assert.equal(parseArgs(["a.md", ...flags(20)]).images.length, 20);
+  assert.throws(() => parseArgs(["a.md", ...flags(21)]), (e) => e instanceof PublishError && e.code === "TOO_MANY_IMAGES" && Boolean(e.hint));
+});
+
+test("too many images exits 2 before any network call", async () => {
+  const s = setup();
+  let called = 0;
+  s.deps.fetchImpl = async () => { called += 1; };
+  try {
+    const img = withImage(s);
+    const argv = [s.file, ...Array.from({ length: 21 }, () => ["--image", img]).flat()];
+    assert.equal(await runPublish(argv, s.deps), 2);
+    assert.equal(s.lastJson().code, "TOO_MANY_IMAGES");
+    assert.equal(called, 0);
+  } finally { s.cleanup(); }
+});
+
+test("a bad second image fails validation before any upload of the first", async () => {
+  const s = setup();
+  let called = 0;
+  s.deps.fetchImpl = async () => { called += 1; };
+  try {
+    const good = withImage(s, "a.png");
+    assert.equal(await runPublish([s.file, "--image", good, "--image", join(s.home, "missing.png")], s.deps), 2);
+    assert.equal(s.lastJson().code, "IMAGE_NOT_FOUND");
+    const txt = withImage(s, "b.txt", Buffer.from("hi"));
+    assert.equal(await runPublish([s.file, "--image", good, "--image", txt], s.deps), 2);
+    assert.equal(s.lastJson().code, "IMAGE_TYPE");
+    assert.equal(await runPublish([s.file, "--image", good, "--image", good, "--alt", "ok", "--alt", "x".repeat(4087)], s.deps), 2);
+    assert.equal(s.lastJson().code, "ALT_TOO_LONG");
+    assert.equal(called, 0);
+  } finally { s.cleanup(); }
+});
+
+test("dry-run with several images reports each one in order without uploading", async () => {
+  const s = setup();
+  let called = 0;
+  s.deps.fetchImpl = async () => { called += 1; };
+  try {
+    const a = withImage(s, "a.png");
+    const b = withImage(s, "b.jpg");
+    assert.equal(await runPublish([s.file, "--image", a, "--alt", "first", "--image", b, "--dry-run"], s.deps), 0);
+    assert.equal(called, 0);
+    const json = s.lastJson();
+    assert.equal("image" in json, false);
+    assert.deepEqual(json.images, [
+      { path: a, bytes: PNG.length, contentType: "image/png", altText: "first" },
+      { path: b, bytes: PNG.length, contentType: "image/jpeg", altText: "" },
+    ]);
+  } finally { s.cleanup(); }
+});
+
+test("publishing several images uploads each in order, then posts once with content.multiImage", async () => {
+  const s = setup();
+  const calls = [];
+  const responses = [
+    initOk("urn:li:image:A"), new Response(null, { status: 201 }),
+    initOk("urn:li:image:B"), new Response(null, { status: 201 }),
+    initOk("urn:li:image:C"), new Response(null, { status: 201 }),
+    new Response(null, { status: 201, headers: { "x-restli-id": "urn:li:share:88" } }),
+  ];
+  s.deps.fetchImpl = async (url, init) => { calls.push({ url, init }); return responses.shift(); };
+  try {
+    const a = withImage(s, "a.png", Buffer.from([1]));
+    const b = withImage(s, "b.png", Buffer.from([2]));
+    const c = withImage(s, "c.png", Buffer.from([3]));
+    assert.equal(await runPublish([s.file, "--image", a, "--alt", "one", "--image", b, "--alt", "two", "--image", c], s.deps), 0);
+    assert.deepEqual(calls.map((x) => x.init.method), ["POST", "PUT", "POST", "PUT", "POST", "PUT", "POST"]);
+    assert.deepEqual(calls.filter((x) => x.init.method === "PUT").map((x) => [...x.init.body]), [[1], [2], [3]]);
+    const body = JSON.parse(calls[6].init.body);
+    assert.deepEqual(body.content, {
+      multiImage: { images: [{ id: "urn:li:image:A", altText: "one" }, { id: "urn:li:image:B", altText: "two" }, { id: "urn:li:image:C" }] },
+    });
+    const json = s.lastJson();
+    assert.equal(json.ok, true);
+    assert.equal(json.url, "https://www.linkedin.com/feed/update/urn:li:share:88");
+    assert.deepEqual(json.images, ["urn:li:image:A", "urn:li:image:B", "urn:li:image:C"]);
+    assert.equal("image" in json, false);
+  } finally { s.cleanup(); }
+});
+
+test("a failed second upload never creates the post", async () => {
+  const s = setup();
+  const methods = [];
+  const responses = [
+    initOk("urn:li:image:A"), new Response(null, { status: 201 }),
+    new Response("denied", { status: 403 }),
+  ];
+  const urls = [];
+  s.deps.fetchImpl = async (url, init) => { methods.push(init.method); urls.push(String(url)); return responses.shift(); };
+  try {
+    assert.equal(await runPublish([s.file, "--image", withImage(s, "a.png"), "--image", withImage(s, "b.png")], s.deps), 1);
+    assert.equal(s.lastJson().code, "FORBIDDEN");
+    assert.deepEqual(methods, ["POST", "PUT", "POST"]);
+    assert.equal(urls[2], IMAGES_INIT_URL);
+    assert.equal(urls.includes(POSTS_URL), false);
   } finally { s.cleanup(); }
 });

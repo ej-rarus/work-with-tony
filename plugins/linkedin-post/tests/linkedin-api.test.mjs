@@ -166,3 +166,32 @@ test("a malformed initialize response never carries the signed upload URL into t
     return true;
   });
 });
+
+test("createPost attaches two or more images as content.multiImage in order", async () => {
+  const { fetchImpl, calls } = fakeFetch([{ status: 201, headers: { "x-restli-id": "urn:li:share:9" } }]);
+  const client = createClient({ accessToken: "tok", fetchImpl });
+  await client.createPost({
+    authorUrn: "u",
+    commentary: "c",
+    visibility: "PUBLIC",
+    images: [{ id: "urn:li:image:A", altText: "first" }, { id: "urn:li:image:B", altText: "" }],
+  });
+  const body = JSON.parse(calls[0].init.body);
+  assert.deepEqual(body.content, { multiImage: { images: [{ id: "urn:li:image:A", altText: "first" }, { id: "urn:li:image:B" }] } });
+  assert.equal(body.lifecycleState, "PUBLISHED");
+});
+
+test("createPost with a one-element images list still uses content.media", async () => {
+  const { fetchImpl, calls } = fakeFetch([{ status: 201, headers: { "x-restli-id": "urn:li:share:10" } }]);
+  const client = createClient({ accessToken: "tok", fetchImpl });
+  await client.createPost({ authorUrn: "u", commentary: "c", visibility: "PUBLIC", images: [{ id: "urn:li:image:A", altText: "" }] });
+  assert.deepEqual(JSON.parse(calls[0].init.body).content, { media: { id: "urn:li:image:A", altText: "" } });
+});
+
+test("createPost refuses more than 20 images without calling LinkedIn", async () => {
+  const { fetchImpl, calls } = fakeFetch([]);
+  const client = createClient({ accessToken: "tok", fetchImpl });
+  const images = Array.from({ length: 21 }, (_, i) => ({ id: `urn:li:image:${i}`, altText: "" }));
+  await assert.rejects(client.createPost({ authorUrn: "u", commentary: "c", visibility: "PUBLIC", images }), (e) => e instanceof RangeError);
+  assert.equal(calls.length, 0);
+});

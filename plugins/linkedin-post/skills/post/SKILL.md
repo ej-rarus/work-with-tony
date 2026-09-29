@@ -78,7 +78,7 @@ If the topic is a single line, ask at most two questions before drafting: the on
    - `Chars:` character count (code points) and the 3000 limit
    - `Preview:` the first two lines as they will appear before "see more"
    - `Hashtags:` count
-   - `Image:` the image path and alt text, only when the user attached an image, and only after the image privacy check below
+   - `Image:` the image path and alt text, one `Image:` line per image in posting order, only when the user attached images, and only after the image privacy check below
    - `Check:` one line per question in the publish-check file: the question id, **PASS** or **FLAG**, and a short reason. For a FLAG, add the file's fix hint in one clause.
 4. Iterate on feedback in conversation. Do not run any script in this phase. Re-run the check on every revised draft.
 5. If the user gives a style remark that should persist ("shorter openings", "no emoji"), ask "Save this to my-style.md?" and append one line only if they say yes.
@@ -86,11 +86,13 @@ If the topic is a single line, ask at most two questions before drafting: the on
 
 ### Attaching an image
 
-The user may give one image (png, jpg/jpeg, or gif, up to 10 MB) to go with the post. Before showing the draft with that image, and again before publishing:
+The user may give one image or up to 20 images (png, jpg/jpeg, or gif, each up to 10 MB) to go with the post. Two or more images publish as one multi-image post in the order given. Run the steps below for every image, one by one, before showing the draft with the images, and again before publishing. A clean result for one image does not cover the others:
 
 1. Open the image and look at it. List anything that identifies a private person: names, email addresses, phone numbers, street addresses, order or account numbers, faces, handwriting, card numbers.
 2. If any is visible, say exactly what and where, and do not publish until the user supplies a redacted version or explicitly says that item may stay. That permission is separate from the publish confirmation: a later "올려" does not approve personal data in the image; the user must name the item or say the image may be posted as is. Offer to make a redacted copy (cover the regions with solid boxes, save as a new file, never overwrite the original) and show it to the user before using it.
-3. Write a short alt text in the post's language describing what the image shows, for screen readers. Show it on the `Image:` line.
+3. Write a short alt text in the post's language describing what the image shows, for screen readers. Show it on that image's `Image:` line.
+
+If the user gives more than 20 images, say that LinkedIn takes at most 20 per post and ask which to drop.
 
 ## 3. Confirm and publish
 
@@ -101,8 +103,9 @@ If the latest draft still has a FLAG from the pre-publish check, confirm once mo
 On confirmation:
 1. Write the final body (exactly what was shown, hashtags included) to `drafts/<unix-timestamp>-<slug>.md`. The slug is 3–6 lowercase ASCII words from the topic joined by `-`.
 2. Run:
-   `node "${CLAUDE_PLUGIN_ROOT}/scripts/publish.mjs" "<draft path>" [--visibility connections] [--image "<image path>" --alt "<alt text>"]`
-   Parse the single JSON line on stdout.
+   `node "${CLAUDE_PLUGIN_ROOT}/scripts/publish.mjs" "<draft path>" [--visibility connections] [--image "<image path>" --alt "<alt text>"]...`
+   For several images, repeat the `--image "<path>" --alt "<alt text>"` pair once per image in posting order; the Nth `--alt` belongs to the Nth `--image`, so always write each `--alt` right after its `--image`.
+   Parse the single JSON line on stdout. A single image is reported as `image`, several as `images` (a list of image urns). If any upload fails, nothing is posted.
 3. If `ok` is true:
    - Move the draft to `published/<YYYY-MM-DD>-<slug>.md` and prepend frontmatter:
      ```
