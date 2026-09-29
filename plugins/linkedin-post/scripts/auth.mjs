@@ -7,7 +7,7 @@ if (Number(process.versions.node.split(".")[0]) < MIN_NODE_MAJOR) {
 
 import { spawn } from "node:child_process";
 import { createServer } from "node:http";
-import { pathToFileURL } from "node:url";
+import { isEntry } from "./lib/entry.mjs";
 import { ConfigError, getHome, loadConfig, saveToken } from "./lib/config.mjs";
 import { createClient } from "./lib/linkedin-api.mjs";
 import {
@@ -116,7 +116,7 @@ export async function runAuth(deps = {}) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntry(import.meta.url)) {
   runAuth()
     .then((code) => process.exit(code))
     .catch((e) => {

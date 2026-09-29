@@ -154,3 +154,12 @@ test("stats skill imports the analytics export, reports honestly, and asks befor
 test("post skill points to the stats skill for bulk numbers", () => {
   assert.ok(readText("skills/post/SKILL.md").includes("/linkedin-post:stats"));
 });
+
+test("SKILL.md documents image attachment with a privacy check before publishing", () => {
+  const skill = readText("skills/post/SKILL.md");
+  assert.ok(skill.includes("--image"), "SKILL.md missing --image");
+  assert.ok(skill.includes("--alt"), "SKILL.md missing --alt");
+  assert.match(skill, /### Attaching an image/);
+  assert.match(skill, /Never attach an image you have not looked at/);
+  assert.doesNotMatch(skill, /Never publish images/);
+});

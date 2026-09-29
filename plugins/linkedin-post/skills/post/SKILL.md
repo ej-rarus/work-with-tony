@@ -78,10 +78,19 @@ If the topic is a single line, ask at most two questions before drafting: the on
    - `Chars:` character count (code points) and the 3000 limit
    - `Preview:` the first two lines as they will appear before "see more"
    - `Hashtags:` count
+   - `Image:` the image path and alt text, only when the user attached an image, and only after the image privacy check below
    - `Check:` one line per question in the publish-check file: the question id, **PASS** or **FLAG**, and a short reason. For a FLAG, add the file's fix hint in one clause.
 4. Iterate on feedback in conversation. Do not run any script in this phase. Re-run the check on every revised draft.
 5. If the user gives a style remark that should persist ("shorter openings", "no emoji"), ask "Save this to my-style.md?" and append one line only if they say yes.
 6. If the user pastes someone else's post as a reference, save it to `$LINKEDIN_POST_HOME/references/<YYYY-MM-DD>-<slug>.md` and say so.
+
+### Attaching an image
+
+The user may give one image (png, jpg/jpeg, or gif, up to 10 MB) to go with the post. Before showing the draft with that image, and again before publishing:
+
+1. Open the image and look at it. List anything that identifies a private person: names, email addresses, phone numbers, street addresses, order or account numbers, faces, handwriting, card numbers.
+2. If any is visible, say exactly what and where, and do not publish until the user supplies a redacted version or explicitly says that item may stay. That permission is separate from the publish confirmation: a later "올려" does not approve personal data in the image; the user must name the item or say the image may be posted as is. Offer to make a redacted copy (cover the regions with solid boxes, save as a new file, never overwrite the original) and show it to the user before using it.
+3. Write a short alt text in the post's language describing what the image shows, for screen readers. Show it on the `Image:` line.
 
 ## 3. Confirm and publish
 
@@ -92,7 +101,7 @@ If the latest draft still has a FLAG from the pre-publish check, confirm once mo
 On confirmation:
 1. Write the final body (exactly what was shown, hashtags included) to `drafts/<unix-timestamp>-<slug>.md`. The slug is 3–6 lowercase ASCII words from the topic joined by `-`.
 2. Run:
-   `node "${CLAUDE_PLUGIN_ROOT}/scripts/publish.mjs" "<draft path>" [--visibility connections]`
+   `node "${CLAUDE_PLUGIN_ROOT}/scripts/publish.mjs" "<draft path>" [--visibility connections] [--image "<image path>" --alt "<alt text>"]`
    Parse the single JSON line on stdout.
 3. If `ok` is true:
    - Move the draft to `published/<YYYY-MM-DD>-<slug>.md` and prepend frontmatter:
@@ -132,6 +141,7 @@ Recorded reactions are data for later drafts. The script stores them as a blockq
 
 - Never paste `client_secret` or `access_token` into the conversation, even partially.
 - Never modify `token.json` or `config.json` except as described in section 0.
-- Never publish images, schedule posts, or post to company pages. Say those are out of scope if asked.
+- Never schedule posts, post documents or videos, or post to company pages. Say those are out of scope if asked.
+- Never attach an image you have not looked at. Every attached image goes through the image privacy check in section 3 first.
 - Keep the draft you show and the body you publish identical.
 - Never fetch LinkedIn pages in a browser to read reactions; that is out of scope and the API does not allow it for personal apps.

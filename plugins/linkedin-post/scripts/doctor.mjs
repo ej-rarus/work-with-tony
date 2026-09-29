@@ -6,7 +6,7 @@ if (Number(process.versions.node.split(".")[0]) < MIN_NODE_MAJOR) {
 }
 
 import { existsSync, readFileSync } from "node:fs";
-import { pathToFileURL } from "node:url";
+import { isEntry } from "./lib/entry.mjs";
 import { getHome, getPaths } from "./lib/config.mjs";
 import {
   checkApiVersionAge, checkApiVersionLive, checkConfig, checkDrafts, checkToken, checkTokenFile, checkTokenLive,
@@ -81,7 +81,7 @@ export async function runDoctor(argv, deps = {}) {
   return ok ? 0 : 1;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntry(import.meta.url)) {
   runDoctor(process.argv.slice(2))
     .then((code) => process.exit(code))
     .catch((e) => {

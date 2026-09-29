@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  API_VERSION, LinkedInApiError, POSTS_URL, USERINFO_URL, createClient, mapStatusToError, postUrl,
+  API_VERSION, IMAGES_INIT_URL, LinkedInApiError, POSTS_URL, USERINFO_URL, createClient, mapStatusToError, postUrl,
 } from "../scripts/lib/linkedin-api.mjs";
 
 function fakeFetch(responses) {
@@ -105,4 +105,64 @@ test("network failure twice surfaces NETWORK error", async () => {
 
 test("postUrl builds the feed update URL", () => {
   assert.equal(postUrl("x"), "https://www.linkedin.com/feed/update/x");
+});
+
+test("uploadImage initializes, PUTs the bytes to the upload URL, and returns the image urn", async () => {
+  const { fetchImpl, calls } = fakeFetch([
+    { status: 200, body: JSON.stringify({ value: { uploadUrl: "https://upload.example/abc", image: "urn:li:image:XYZ" } }) },
+    { status: 201 },
+  ]);
+  const client = createClient({ accessToken: "tok", fetchImpl });
+  const bytes = new Uint8Array([1, 2, 3]);
+  const urn = await client.uploadImage({ ownerUrn: "urn:li:person:abc", bytes });
+  assert.equal(urn, "urn:li:image:XYZ");
+  assert.equal(calls[0].url, IMAGES_INIT_URL);
+  assert.equal(calls[0].init.method, "POST");
+  assert.deepEqual(JSON.parse(calls[0].init.body), { initializeUploadRequest: { owner: "urn:li:person:abc" } });
+  assert.equal(calls[0].init.headers["LinkedIn-Version"], API_VERSION);
+  assert.equal(calls[1].url, "https://upload.example/abc");
+  assert.equal(calls[1].init.method, "PUT");
+  assert.equal(calls[1].init.headers.Authorization, "Bearer tok");
+  assert.equal(calls[1].init.body, bytes);
+});
+
+test("uploadImage maps an initialize failure and a malformed initialize response", async () => {
+  const denied = createClient({ accessToken: "tok", fetchImpl: fakeFetch([{ status: 403, body: "no" }]).fetchImpl });
+  await assert.rejects(denied.uploadImage({ ownerUrn: "u", bytes: new Uint8Array() }), (e) => e.code === "FORBIDDEN");
+  const odd = createClient({ accessToken: "tok", fetchImpl: fakeFetch([{ status: 200, body: "{}" }]).fetchImpl });
+  await assert.rejects(odd.uploadImage({ ownerUrn: "u", bytes: new Uint8Array() }), (e) => e instanceof LinkedInApiError && e.code === "UNKNOWN");
+});
+
+test("uploadImage surfaces a failed PUT", async () => {
+  const { fetchImpl, calls } = fakeFetch([
+    { status: 200, body: JSON.stringify({ value: { uploadUrl: "https://upload.example/abc", image: "urn:li:image:XYZ" } }) },
+    { status: 500, body: "boom" },
+  ]);
+  const client = createClient({ accessToken: "tok", fetchImpl, sleep: async () => {} });
+  await assert.rejects(client.uploadImage({ ownerUrn: "u", bytes: new Uint8Array([1]) }), (e) => e.code === "SERVER_ERROR");
+  assert.equal(calls.length, 2);
+});
+
+test("createPost attaches an image as content.media when given", async () => {
+  const { fetchImpl, calls } = fakeFetch([{ status: 201, headers: { "x-restli-id": "urn:li:share:7" } }]);
+  const client = createClient({ accessToken: "tok", fetchImpl });
+  await client.createPost({ authorUrn: "u", commentary: "c", visibility: "PUBLIC", image: { id: "urn:li:image:XYZ", altText: "receipt" } });
+  assert.deepEqual(JSON.parse(calls[0].init.body).content, { media: { id: "urn:li:image:XYZ", altText: "receipt" } });
+});
+
+test("createPost without an image sends no content key", async () => {
+  const { fetchImpl, calls } = fakeFetch([{ status: 201, headers: { "x-restli-id": "urn:li:share:8" } }]);
+  const client = createClient({ accessToken: "tok", fetchImpl });
+  await client.createPost({ authorUrn: "u", commentary: "c", visibility: "PUBLIC" });
+  assert.equal("content" in JSON.parse(calls[0].init.body), false);
+});
+
+test("a malformed initialize response never carries the signed upload URL into the error", async () => {
+  const body = JSON.stringify({ value: { uploadUrl: "https://upload.example/SECRET-SIGNATURE" } });
+  const client = createClient({ accessToken: "tok", fetchImpl: fakeFetch([{ status: 200, body }]).fetchImpl });
+  await assert.rejects(client.uploadImage({ ownerUrn: "u", bytes: new Uint8Array() }), (e) => {
+    assert.equal(e.code, "UNKNOWN");
+    assert.ok(!JSON.stringify({ m: e.message, b: e.body }).includes("SECRET-SIGNATURE"), "upload URL leaked");
+    return true;
+  });
 });

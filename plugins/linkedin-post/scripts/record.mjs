@@ -6,7 +6,7 @@ if (Number(process.versions.node.split(".")[0]) < MIN_NODE_MAJOR) {
 }
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { pathToFileURL } from "node:url";
+import { isEntry } from "./lib/entry.mjs";
 import { parseFrontmatter, serializeFrontmatter } from "./lib/frontmatter.mjs";
 
 const COUNTERS = ["likes", "comments", "reposts", "impressions"];
@@ -111,6 +111,6 @@ export function runRecord(argv, deps = {}) {
   }
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntry(import.meta.url)) {
   process.exitCode = runRecord(process.argv.slice(2));
 }

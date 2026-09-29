@@ -62,6 +62,14 @@ The skill drafts, shows character count and the two-line preview, iterates with 
 
 Each draft also picks one of six post structures (`scene`, `rules`, `questions`, `contrarian`, `compare`, `short`) and avoids the structures used by your three most recent posts, so a daily habit does not turn into the same arc every day. See `skills/post/references/structures.md`; drop a `structures.md` into `~/.linkedin-post/` to replace it with your own.
 
+### Images
+
+One image (png, jpg/jpeg or gif, up to 10 MB) can go with a post. Hand it to the skill with the topic; before the image is used, the skill opens it, lists anything that identifies a private person (names, email, phone, address, order numbers, faces), and offers a redacted copy. It publishes only after you confirm. The script uploads the image through LinkedIn's Images API and attaches it with alt text:
+
+```
+node scripts/publish.mjs draft.md --image receipt-redacted.png --alt "주문 영수증, 개인정보는 가림"
+```
+
 ### Pre-publish check
 
 Every draft is checked against `skills/post/references/publish-check.md` before it goes out. The default asks two questions: does the reader read this as being about their own work, and does the reader leave with something they can use. Each gets PASS or FLAG with a one-line reason under the draft. A FLAG never blocks publishing; it only adds one extra confirmation. Put your own questions, for example ones derived from your post statistics, in `~/.linkedin-post/publish-check.md` to replace the default.
@@ -125,7 +133,7 @@ Exit codes for `auth.mjs` and `publish.mjs`: 0 success, 1 LinkedIn API error, 2 
 
 ## Out of scope (for now)
 
-Images and documents, scheduled posts, company pages, editing or deleting posts, reading analytics through the API.
+Documents and videos, multiple images, scheduled posts, company pages, editing or deleting posts, reading analytics through the API.
 
 ## Development
 

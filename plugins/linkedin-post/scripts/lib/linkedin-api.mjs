@@ -9,6 +9,7 @@ export function resolveApiVersion(env = process.env) {
 export const API_VERSION = resolveApiVersion().version;
 export const POSTS_URL = "https://api.linkedin.com/rest/posts";
 export const USERINFO_URL = "https://api.linkedin.com/v2/userinfo";
+export const IMAGES_INIT_URL = "https://api.linkedin.com/rest/images?action=initializeUpload";
 
 const ERROR_TABLE = {
   UNAUTHORIZED: "Access token is invalid or expired. Run `node scripts/auth.mjs` to sign in again.",
@@ -109,8 +110,43 @@ export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSl
     return { sub: data.sub, name: data.name };
   }
 
-  async function createPost({ authorUrn, commentary, visibility }) {
-    const body = {
+  // Initialize an image upload for the member, PUT the bytes, return the image urn.
+  // An uploaded image that never gets attached to a post is harmless, so both
+  // steps may retry once on any network failure.
+  async function uploadImage({ ownerUrn, bytes }) {
+    const init = await request(
+      IMAGES_INIT_URL,
+      {
+        method: "POST",
+        headers: { ...baseHeaders, "Content-Type": "application/json" },
+        body: JSON.stringify({ initializeUploadRequest: { owner: ownerUrn } }),
+      },
+      { retryOn: alwaysRetry },
+    );
+    if (!init.ok) throw mapStatusToError(init.status, await init.text());
+    const text = await init.text();
+    let value;
+    try {
+      value = JSON.parse(text).value;
+    } catch {
+      value = undefined;
+    }
+    if (!value?.uploadUrl || !value?.image) {
+      // Never echo the raw body here: it may contain a signed, writable upload URL.
+      const present = ["uploadUrl", "image"].filter((k) => Boolean(value?.[k])).join(", ") || "none";
+      throw new LinkedInApiError("UNKNOWN", init.status, `initializeUpload response fields present: ${present}`, "Image upload could not be initialized: uploadUrl or image missing");
+    }
+    const put = await request(
+      value.uploadUrl,
+      { method: "PUT", headers: { Authorization: baseHeaders.Authorization }, body: bytes },
+      { retryOn: alwaysRetry },
+    );
+    if (!put.ok) throw mapStatusToError(put.status, await put.text());
+    return value.image;
+  }
+
+  async function createPost({ authorUrn, commentary, visibility, image }) {
+    const base = {
       author: authorUrn,
       commentary,
       visibility,
@@ -118,6 +154,7 @@ export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSl
       lifecycleState: "PUBLISHED",
       isReshareDisabledByAuthor: false,
     };
+    const body = image ? { ...base, content: { media: { id: image.id, altText: image.altText } } } : base;
     const res = await request(
       POSTS_URL,
       {
@@ -133,5 +170,5 @@ export function createClient({ accessToken, fetchImpl = fetch, sleep = defaultSl
     return { id, url: postUrl(id) };
   }
 
-  return { getUserInfo, createPost };
+  return { getUserInfo, uploadImage, createPost };
 }
