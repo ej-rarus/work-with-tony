@@ -82,7 +82,7 @@ def _seconds(value: object, label: str, filename: str) -> float:
 
 
 def plan_cuts(
-    input_dir: Path, shot_map: Path | None, *, ffprobe: str
+    input_dir: Path, shot_map: Path | None, *, ffprobe: str, has_narration: bool = False
 ) -> tuple[list[dict], list[str]]:
     """Return validated cuts in story order and any omissions to report."""
     input_dir = input_dir.resolve()
@@ -98,6 +98,8 @@ def plan_cuts(
 
     if shot_map is not None:
         shots = _shots_from_map(shot_map)
+        if has_narration and not shots:
+            raise ValueError("Select at least one video shot in the shot map for the narration.")
     else:
         shots = []
         for name in media:
@@ -112,7 +114,9 @@ def plan_cuts(
 
     ignored = [name for name in media if name not in used_names]
     mapped_roles = {shot["role"] for shot in shots}
-    required_roles = ("talk",) if shot_map is not None else ("before", "after", "talk")
+    required_roles = ("before", "after") if shot_map is None else ()
+    if not has_narration:
+        required_roles += ("talk",)
     missing_roles = [role for role in required_roles if role not in mapped_roles]
     if missing_roles:
         candidates = f" Unassigned files: {_filenames(ignored)}." if ignored else ""
@@ -155,6 +159,6 @@ def plan_cuts(
             "path": path, "role": role, "start": start, "end": end, "has_audio": has_audio,
         })
 
-    if not any(cut["role"] == "talk" and cut["has_audio"] for cut in cuts):
+    if not has_narration and not any(cut["role"] == "talk" and cut["has_audio"] for cut in cuts):
         raise ValueError("At least one talk shot needs an audio track to generate captions.")
     return cuts, warnings

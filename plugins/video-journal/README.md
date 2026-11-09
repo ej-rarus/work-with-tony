@@ -6,7 +6,7 @@ Find a filmable moment in your notes, prepare the episode, and edit the footage.
 |---|---|
 | `find-topics` | Up to three candidates with a source note, working title, first shot, and a question to answer on camera. Existing episodes and ideas that need a future event are labeled. |
 | `prepare-episode` | An episode folder and a copy of the working template with a shooting checklist and a separate read-aloud script. An existing episode can be resumed. |
-| [`rough-cut`](skills/rough-cut/SKILL.md) | A vertical MP4 with Korean subtitles, a separate SRT, and the source ranges used in the cut. |
+| [`rough-cut`](skills/rough-cut/SKILL.md) | A vertical MP4 with Korean subtitles from camera speech or a separate narration recording, plus a separate SRT and the source ranges used in the cut. |
 
 ## Install
 
@@ -46,11 +46,12 @@ $video-journal:find-topics 이번 메모에서 후보를 골라서 소재함에�
 $video-journal:prepare-episode "처음 걸어본 산책길"로 기록 02 준비해줘.
 $video-journal:prepare-episode 기록 01의 촬영 준비 상태만 확인해줘.
 $video-journal:rough-cut "/path/to/Pocket 3 originals"로 기록 01 편집 초안과 한글 자막 만들어줘.
+$video-journal:rough-cut "/path/to/Pocket 3 originals"에 "/path/to/내레이션.m4a"를 얹고 한글 자막 만들어줘.
 ```
 
 Use `/video-journal:find-topics`, `/video-journal:prepare-episode`, and `/video-journal:rough-cut` in Claude Code. The preparation skill follows the configured Drive location and checks the selected account before writing. Give it the same episode number to resume a partial run. For a preview, ask it to draft or check the episode first. Ask for PDFs when you need files to read on set.
 
-Rough cuts run locally with Python 3.10+, FFmpeg with libass, `ffprobe`, a Korean font, and `whisper-cli` with a multilingual model. The footage folder can use camera filenames. The skill inspects the clips and records the chosen roles and ranges in a shot map. Add the episode's checklist when it is available. The three outputs go into a new folder beside the originals by default.
+Rough cuts run locally with Python 3.10+, FFmpeg with libass, `ffprobe`, a Korean font, and `whisper-cli` with a multilingual model. The footage folder can use camera filenames. The skill inspects the clips and records the chosen roles and ranges in a shot map. Add the episode's checklist when it is available. A separate M4A, WAV, MP3, or AIFF recording can be added with `--narration`. The video uses short white captions with a thin black outline below the middle of the screen. The three outputs go into a new folder beside the originals by default.
 
 ## Development
 

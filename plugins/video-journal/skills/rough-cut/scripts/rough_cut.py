@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import math
 import os
 import re
 import shutil
@@ -11,6 +12,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from captions import write_captions
+from narration import mix_narration, prepare_narration
 from plan import plan_cuts
 from render import FRAME_RATE, burn_captions, cut_frames, render_timeline
 
@@ -39,46 +42,6 @@ def run(command, action):
     return result
 
 
-def parse_timestamp(value):
-    hours, minutes, seconds, millis = map(int, re.split("[:,]", value))
-    return ((hours * 60 + minutes) * 60 + seconds) * 1000 + millis
-
-
-def timestamp(milliseconds):
-    seconds, millis = divmod(milliseconds, 1000)
-    minutes, second = divmod(seconds, 60)
-    hours, minute = divmod(minutes, 60)
-    return f"{hours:02}:{minute:02}:{second:02},{millis:03}"
-
-
-def retime_captions(raw, output, talk_start, first_speech, timeline_end):
-    cues = []
-    timecode = r"\d{2,}:\d{2}:\d{2},\d{3}"
-    for block in re.split(r"\n\s*\n", raw.read_text(encoding="utf-8-sig").strip()):
-        lines = block.splitlines()
-        if not lines:
-            continue
-        match = re.fullmatch(rf"({timecode}) --> ({timecode})", lines[1].strip()) if len(lines) >= 3 else None
-        if not match or not lines[0].strip().isdigit():
-            raise ValueError("Whisper produced a malformed SRT cue.")
-        start = max(first_speech, talk_start + parse_timestamp(match[1]))
-        end = min(timeline_end, talk_start + parse_timestamp(match[2]))
-        if cues:
-            start = max(start, cues[-1][1])
-        caption = " ".join(" ".join(lines[2:]).split())
-        if caption and end > start:
-            cues.append((start, end, caption))
-    if not cues:
-        raise ValueError("No captionable speech was detected. Check the audio and ranges of the talk shots.")
-    output.write_text(
-        "".join(
-            f"{index}\n{timestamp(start)} --> {timestamp(end)}\n{caption}\n\n"
-            for index, (start, end, caption) in enumerate(cues, 1)
-        ),
-        encoding="utf-8",
-    )
-
-
 def make_rough_cut(args):
     source = args.input_dir.resolve(strict=True)
     destination = (args.output or source.with_name(f"{source.name}-rough-cut")).absolute()
@@ -90,6 +53,12 @@ def make_rough_cut(args):
     if destination.exists():
         raise ValueError(f"Output already exists. Choose a new directory: {destination}")
 
+    narration_start = args.narration_start if args.narration_start is not None else 0.0
+    if args.narration_start is not None and args.narration is None:
+        raise ValueError("--narration-start requires --narration.")
+    if not math.isfinite(narration_start) or narration_start < 0:
+        raise ValueError("--narration-start must be a finite, non-negative number of seconds.")
+
     ffprobe = shutil.which("ffprobe")
     whisper = shutil.which("whisper-cli")
     if not ffprobe or not whisper:
@@ -99,14 +68,18 @@ def make_rough_cut(args):
     if not model.is_file() or not model.stat().st_size or model.name.endswith(".en.bin"):
         raise ValueError(f"Provide a multilingual whisper.cpp model via --model. Checked {model}")
 
-    cuts, warnings = plan_cuts(source, args.shot_map, ffprobe=ffprobe)
+    has_narration = args.narration is not None
+    cuts, warnings = plan_cuts(source, args.shot_map, ffprobe=ffprobe, has_narration=has_narration)
     position = 0
     talk_start = None
     edit_list = []
     for cut in cuts:
         next_position = position + cut_frames(cut["start"], cut["end"])
-        if talk_start is None and cut["role"] == "talk" and cut["has_audio"]:
-            talk_start = position
+        if cut["role"] == "talk":
+            if has_narration:
+                cut["has_audio"] = False
+            elif talk_start is None and cut["has_audio"]:
+                talk_start = position
         edit_list.append({
             "file": Path(cut["path"]).name,
             "role": cut["role"],
@@ -116,8 +89,10 @@ def make_rough_cut(args):
             "timeline_end_frame": next_position,
         })
         position = next_position
-    if talk_start is None:
+    if not has_narration and talk_start is None:
         raise ValueError("At least one talk shot needs an audio track for Korean captions.")
+    timeline_seconds = position / FRAME_RATE
+    edit_metadata = {"fps": FRAME_RATE, "duration_frames": position, "cuts": edit_list}
 
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix=".rough-cut-", dir=destination.parent) as scratch:
@@ -129,11 +104,35 @@ def make_rough_cut(args):
         captions = result / "captions.srt"
         preview = result / "rough-cut.mp4"
 
+        if has_narration:
+            narration = scratch / "narration.wav"
+            duration = prepare_narration(args.narration.expanduser(), narration, ffmpeg=ffmpeg, ffprobe=ffprobe)
+            speech_end = narration_start + duration
+            if speech_end > timeline_seconds:
+                raise ValueError(
+                    f"Narration ends at {speech_end:.3f}s, but the edit is {timeline_seconds:.3f}s. "
+                    "Select longer source ranges or start the narration earlier."
+                )
+            edit_metadata["narration"] = {
+                "file": args.narration.name,
+                "timeline_start_seconds": narration_start,
+                "timeline_end_seconds": speech_end,
+            }
+
         render_timeline(cuts, picture, ffmpeg=ffmpeg)
+        if has_narration:
+            mixed = scratch / "narrated.mp4"
+            mix_narration(picture, narration, mixed, ffmpeg=ffmpeg, start=narration_start)
+            picture = mixed
+            speech_source, source_start, speech_offset = narration, 0.0, narration_start
+        else:
+            source_start = talk_start / FRAME_RATE
+            speech_source, speech_offset, speech_end = picture, source_start, timeline_seconds
+
         dialogue_result = run(
             [
-                ffmpeg, "-nostdin", "-hide_banner", "-i", str(picture),
-                "-af", f"atrim=start={talk_start / FRAME_RATE:.9f},"
+                ffmpeg, "-nostdin", "-hide_banner", "-i", str(speech_source),
+                "-af", f"atrim=start={source_start:.9f},"
                 "asetpts=PTS-STARTPTS,silencedetect=noise=-45dB:d=0.25",
                 "-vn", "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", str(dialogue),
             ],
@@ -142,17 +141,18 @@ def make_rough_cut(args):
         run(
             [
                 whisper, "-m", str(model), "-f", str(dialogue), "-l", "ko",
-                "-osrt", "-ml", "34", "-sow", "-of", str(scratch / "speech"),
+                "-osrt", "-ml", "1", "-sow", "-of", str(scratch / "speech"),
             ],
             "Transcribing Korean speech",
         )
-        talk_ms = round(talk_start * 1000 / FRAME_RATE)
-        first_speech = talk_ms
+        offset_ms = round(speech_offset * 1000)
+        first_speech = offset_ms
         leading_gap = re.search(r"silence_start: (\S+).*?silence_end: (\S+)", dialogue_result.stderr, re.S)
         if leading_gap and float(leading_gap[1]) < 0.03:
             first_speech += round(float(leading_gap[2]) * 1000)
-        retime_captions(
-            scratch / "speech.srt", captions, talk_ms, first_speech, round(position * 1000 / FRAME_RATE)
+        write_captions(
+            scratch / "speech.srt", captions,
+            speech_offset=offset_ms, first_speech=first_speech, speech_end=round(speech_end * 1000),
         )
         burn_captions(picture, captions, preview, ffmpeg=ffmpeg)
         run(
@@ -160,7 +160,7 @@ def make_rough_cut(args):
             "Decoding the finished preview",
         )
         (result / "cuts.json").write_text(
-            json.dumps({"fps": FRAME_RATE, "duration_frames": position, "cuts": edit_list}, ensure_ascii=False, indent=2) + "\n",
+            json.dumps(edit_metadata, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
         if destination.exists() or destination.is_symlink():
@@ -176,6 +176,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input_dir", type=Path, help="Local folder containing Pocket 3 MP4/MOV clips")
     parser.add_argument("--shot-map", type=Path, help="JSON with the selected shots, roles and optional source ranges")
+    parser.add_argument("--narration", type=Path, help="Separate WAV, M4A, MP3, or AIFF narration recording")
+    parser.add_argument("--narration-start", type=float, help="Narration start on the finished timeline, in seconds (default: 0)")
     parser.add_argument("--output", type=Path, help="New directory for the MP4, SRT, and edit list")
     parser.add_argument("--ffmpeg", help="FFmpeg binary with the libass subtitles filter")
     parser.add_argument("--model", type=Path, default=os.environ.get(

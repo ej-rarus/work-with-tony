@@ -87,8 +87,8 @@ def burn_captions(source: Path, captions: Path, output: Path, *, ffmpeg: str) ->
     """Burn UTF-8 SRT onto a rendered timeline, preserving its audio."""
     style = (
         f"PlayResX={WIDTH},PlayResY={HEIGHT},FontName=Apple SD Gothic Neo,"
-        "FontSize=62,PrimaryColour=&H00FFFFFF,OutlineColour=&H20000000,"
-        "BorderStyle=1,Outline=4,Shadow=1,Alignment=2,MarginL=90,MarginR=155,MarginV=335"
+        "FontSize=72,Bold=-1,PrimaryColour=&H00FFFFFF,OutlineColour=&H10000000,"
+        "BorderStyle=1,Outline=4.5,Shadow=0,Alignment=2,MarginL=108,MarginR=108,MarginV=715"
     )
     with tempfile.TemporaryDirectory(prefix=".captions-", dir=output.parent) as directory:
         work = Path(directory).resolve()

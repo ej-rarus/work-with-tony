@@ -91,7 +91,7 @@
     {
       "name": "video-journal",
       "description": "Find video journal topics, prepare an episode in Drive, and turn local footage into a vertical rough cut with Korean subtitles.",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "source": "./plugins/video-journal",
       "author": {
         "name": "Tony (Eunjae Lee)",
