@@ -85,10 +85,11 @@ def render_timeline(cuts: list[dict], output: Path, *, ffmpeg: str) -> None:
 
 def burn_captions(source: Path, captions: Path, output: Path, *, ffmpeg: str) -> None:
     """Burn UTF-8 SRT onto a rendered timeline, preserving its audio."""
+    # libass force_style uses a ratio for ScaleX.
     style = (
-        f"PlayResX={WIDTH},PlayResY={HEIGHT},FontName=Apple SD Gothic Neo,"
-        "FontSize=72,Bold=-1,PrimaryColour=&H00FFFFFF,OutlineColour=&H10000000,"
-        "BorderStyle=1,Outline=4.5,Shadow=0,Alignment=2,MarginL=108,MarginR=108,MarginV=715"
+        f"PlayResX={WIDTH},PlayResY={HEIGHT},FontName=PilGi,FontSize=56,ScaleX=0.78,Spacing=-2,Bold=0,"
+        "PrimaryColour=&H00FFFFFF,OutlineColour=&H00000000,BackColour=&H00000000,"
+        "BorderStyle=3,Outline=9,Shadow=0,Alignment=2,MarginL=108,MarginR=108,MarginV=871"
     )
     with tempfile.TemporaryDirectory(prefix=".captions-", dir=output.parent) as directory:
         work = Path(directory).resolve()

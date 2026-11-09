@@ -28,7 +28,7 @@ The shot map lists immediate filenames, in order within each scene role. `start`
 
 ## Render and verify
 
-Resolve `scripts/rough_cut.py` relative to this skill. Use Python 3.10+, `ffprobe`, FFmpeg with the `subtitles` filter (libass), a Korean font, and `whisper-cli` with a local multilingual model. The script looks for Homebrew's `ffmpeg-full` and the cached `~/.cache/whisper.cpp/ggml-large-v3-turbo-q5_0.bin`. Pass `--ffmpeg` or `--model` for other locations.
+Resolve `scripts/rough_cut.py` relative to this skill. Use Python 3.10+, `ffprobe`, FFmpeg with the `subtitles` filter (libass), the PilGi Korean handwriting font, and `whisper-cli` with a local multilingual model. The script looks for Homebrew's `ffmpeg-full` and the cached `~/.cache/whisper.cpp/ggml-large-v3-turbo-q5_0.bin`. Pass `--ffmpeg` or `--model` for other locations.
 
 ```sh
 python3 -B /path/to/scripts/rough_cut.py "/path/to/originals" \
@@ -39,4 +39,4 @@ Omit `--shot-map` for the filename prefixes above. Omit `--output` to create a s
 
 For a separate voice recording, add `--narration "/path/to/recording.m4a"`. It also accepts WAV, MP3, and AIFF. Narration starts at the beginning by default. Use `--narration-start 1.5` to leave an opening beat. Make the selected footage long enough for the whole recording and its offset. The editor preserves the recording's timing and transcribes it directly, then aligns the SRT to the edit. If it overflows the available footage, choose longer usable shots or ask about the cut rather than dropping speech.
 
-Return the 1080 × 1920 `rough-cut.mp4` with burned-in Korean subtitles, editable `captions.srt`, and `cuts.json` with the selected source ranges. Captions split at detected sentence endings first, then at word boundaries within longer sentences. The preset uses short centered white Korean Gothic phrases with a thin black outline and no background box, just below the middle of the frame. Inspect a rendered subtitle frame for Hangul and placement, and check the edit and voice balance. Use the read-aloud script to check spelling while preserving the actual spoken wording. Report any ambiguous take or caption that needs review.
+Return the 1080 × 1920 `rough-cut.mp4` with burned-in Korean subtitles, editable `captions.srt`, and `cuts.json` with the selected source ranges. Captions split at detected sentence endings first, then at word boundaries within longer sentences. The preset centers short white handwritten phrases slightly below the middle of the frame with a black box fitted to each line. Inspect a rendered subtitle frame for Hangul, box width, and placement, and check the edit and voice balance. Use the read-aloud script to check spelling while preserving the actual spoken wording. Report any ambiguous take or caption that needs review.

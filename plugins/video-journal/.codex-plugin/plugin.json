@@ -1,7 +1,7 @@
 {
   "name": "video-journal",
-  "version": "0.3.0",
-  "description": "Find video journal topics, prepare an episode in Drive, and turn local footage into a vertical rough cut with Korean subtitles.",
+  "version": "0.4.0",
+  "description": "Find video journal topics, prepare episodes in Drive, edit local footage with Korean subtitles, and draft Instagram and YouTube posts.",
   "author": {
     "name": "Tony (Eunjae Lee)",
     "url": "https://github.com/ej-rarus"
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Video Journal",
-    "shortDescription": "일상 영상의 소재를 찾고 촬영 준비와 편집을 도와요",
-    "longDescription": "Find filmable topics in selected notes, then prepare an episode folder, shooting checklist, and read-aloud script. Edit local footage into a vertical preview with Korean subtitles and a separate SRT.",
+    "shortDescription": "일상 영상의 소재 찾기부터 게시 문구 초안까지 도와요",
+    "longDescription": "Find filmable topics and prepare an episode folder, shooting checklist, and read-aloud script. Edit a vertical preview with Korean subtitles and a separate SRT, then draft an Instagram Reel caption and a YouTube Shorts title and description.",
     "developerName": "Tony (Eunjae Lee)",
     "category": "Creative",
     "capabilities": [
