@@ -1,0 +1,7 @@
+{
+  "channelName": "Example Video Diary",
+  "driveAccountEmail": "creator@example.com",
+  "channelFolderUrl": "https://drive.google.com/drive/folders/YOUR_CHANNEL_FOLDER_ID",
+  "topicInboxUrl": "https://docs.google.com/document/d/YOUR_TOPIC_INBOX_DOC_ID/edit",
+  "episodeTemplateUrl": "https://docs.google.com/document/d/YOUR_EPISODE_TEMPLATE_DOC_ID/edit"
+}

@@ -87,6 +87,16 @@
       "author": {
         "name": "Tony (Eunjae Lee)"
       }
+    },
+    {
+      "name": "video-journal",
+      "description": "Find filmable video journal topics from chosen notes and prepare a shooting plan, script, and Drive workspace for a selected episode.",
+      "version": "0.1.0",
+      "source": "./plugins/video-journal",
+      "author": {
+        "name": "Tony (Eunjae Lee)",
+        "url": "https://github.com/ej-rarus"
+      }
     }
   ]
 }

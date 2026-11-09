@@ -1,0 +1,35 @@
+{
+  "name": "video-journal",
+  "version": "0.1.0",
+  "description": "Find filmable video journal topics from chosen notes and prepare a shooting plan, script, and Drive workspace for a selected episode.",
+  "author": {
+    "name": "Tony (Eunjae Lee)",
+    "url": "https://github.com/ej-rarus"
+  },
+  "repository": "https://github.com/ej-rarus/work-with-tony",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "journal",
+    "filming",
+    "creative",
+    "google-drive"
+  ],
+  "homepage": "https://github.com/ej-rarus/work-with-tony",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Video Journal",
+    "shortDescription": "일상 메모에서 소재를 뽑고 촬영을 준비해요",
+    "longDescription": "Find filmable topics in selected notes. Turn a chosen topic into an episode folder, a working document, a shooting checklist, and a separate read-aloud script using your own channel configuration.",
+    "developerName": "Tony (Eunjae Lee)",
+    "category": "Creative",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "$video-journal:find-topics 소재함에서 촬영 후보 뽑아줘",
+      "$video-journal:prepare-episode 이 소재로 기록 02 준비해줘"
+    ]
+  }
+}
