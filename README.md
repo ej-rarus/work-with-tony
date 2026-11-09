@@ -13,7 +13,7 @@
 | [**linkedin-post**](plugins/linkedin-post/) | 대화로 LinkedIn 글을 다듬고 공식 API로 내 프로필에 발행 | 매일 글을 올리는데 초안 작성과 게시가 번거로울 때 |
 | [**instagram-carousel**](plugins/instagram-carousel/) | 메모나 주제로 인스타 카드뉴스를 기획하고, 수정 가능한 HTML과 1080×1350 PNG로 만들기 | 교육용·정보형 카드뉴스를 일정한 디자인으로 꾸준히 만들고 싶을 때 |
 | [**repurpose**](plugins/repurpose/) | 글 하나에서 핵심 메시지를 확정하고, LinkedIn 글 초안과 인스타 캐러셀 기획을 함께 만들기 | 회고나 메모 하나를 두 채널에 따로 쓰느라 시간을 두 번 쓰기 싫을 때 |
-| [**video-journal**](plugins/video-journal/) | 일상 메모에서 촬영 후보를 고르고, 고른 소재로 회차 폴더와 대본·촬영 순서를 준비 | 영상 일지나 짧은 연재를 꾸준히 준비하고 싶을 때 |
+| [**video-journal**](plugins/video-journal/) | 일상 메모에서 소재를 고르고, 회차 준비부터 한글 자막이 들어간 편집 초안까지 제작 | 영상 일지나 짧은 연재를 만들 때 |
 | [**explain-this**](plugins/explain-this/) | 로컬 Markdown·HTML·JSON 파일을 쉬운 말로 설명하고, 원하면 오프라인 연습 화면까지 만들기 | 받은 설정 파일이나 문서가 무슨 뜻인지 직접 만져 보며 이해하고 싶을 때 |
 | [**hwp-form**](plugins/hwp-form/) | 빈 한글(HWP/HWPX) 신청서를 주면 내 정보와 자료로 채운 새 파일을 만들고, 서명·동의처럼 직접 할 일만 체크리스트로 남기기 | 지원사업·공모전 신청서를 낼 때마다 같은 정보를 반복해서 칠 때 |
 | [**prd-check**](plugins/prd-check/) | Markdown PRD를 팀 표준 양식과 비교해 줄 번호가 달린 점검표 작성 | PRD를 리뷰에 올리기 전에 빠진 절이나 형식 오류를 잡고 싶을 때 |
@@ -140,15 +140,17 @@ codex plugin add linkedin-post@work-with-tony
 
 [자세히 보기](plugins/repurpose/)
 
-### video-journal: 소재 찾기부터 회차 준비까지
+### video-journal: 소재 찾기부터 편집 초안까지
 
 ```text
 $video-journal:find-topics 소재함의 새 메모에서 찍을 만한 후보를 뽑아줘.
 $video-journal:prepare-episode 이 소재로 기록 02 준비해줘.
+$video-journal:rough-cut 포켓 3 원본으로 기록 02 편집 초안과 한글 자막 만들어줘.
 ```
 
 - 지정한 메모에서 첫 컷과 질문이 있는 촬영 후보를 고릅니다.
 - 고른 후보로 회차 폴더와 작업 기록을 준비합니다. 같은 회차를 다시 요청하면 기존 폴더를 이어서 씁니다.
+- 포켓 3 원본을 로컬에서 편집해 한글 자막이 들어간 세로 MP4와 별도 SRT를 만듭니다.
 - 채널 이름, Google 계정, Drive 링크는 각자 [설정 예시](plugins/video-journal/config.example.json)를 복사해 개인 설정에 넣습니다.
 
 설치: `/plugin install video-journal@work-with-tony` (Claude Code) · `codex plugin add video-journal@work-with-tony` (Codex)

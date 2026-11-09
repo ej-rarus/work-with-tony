@@ -1,7 +1,7 @@
 {
   "name": "video-journal",
-  "version": "0.1.0",
-  "description": "Find filmable video journal topics from chosen notes and prepare a shooting plan, script, and Drive workspace for a selected episode.",
+  "version": "0.2.0",
+  "description": "Find video journal topics, prepare an episode in Drive, and turn local footage into a vertical rough cut with Korean subtitles.",
   "author": {
     "name": "Tony (Eunjae Lee)",
     "url": "https://github.com/ej-rarus"

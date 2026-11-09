@@ -1,7 +1,7 @@
 {
   "name": "video-journal",
-  "version": "0.1.0",
-  "description": "Find filmable video journal topics from chosen notes and prepare a shooting plan, script, and Drive workspace for a selected episode.",
+  "version": "0.2.0",
+  "description": "Find video journal topics, prepare an episode in Drive, and turn local footage into a vertical rough cut with Korean subtitles.",
   "author": {
     "name": "Tony (Eunjae Lee)",
     "url": "https://github.com/ej-rarus"
@@ -19,8 +19,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Video Journal",
-    "shortDescription": "일상 메모에서 소재를 뽑고 촬영을 준비해요",
-    "longDescription": "Find filmable topics in selected notes. Turn a chosen topic into an episode folder, a working document, a shooting checklist, and a separate read-aloud script using your own channel configuration.",
+    "shortDescription": "일상 영상의 소재를 찾고 촬영 준비와 편집을 도와요",
+    "longDescription": "Find filmable topics in selected notes, then prepare an episode folder, shooting checklist, and read-aloud script. Edit local footage into a vertical preview with Korean subtitles and a separate SRT.",
     "developerName": "Tony (Eunjae Lee)",
     "category": "Creative",
     "capabilities": [
@@ -29,7 +29,8 @@
     ],
     "defaultPrompt": [
       "$video-journal:find-topics 소재함에서 촬영 후보 뽑아줘",
-      "$video-journal:prepare-episode 이 소재로 기록 02 준비해줘"
+      "$video-journal:prepare-episode 이 소재로 기록 02 준비해줘",
+      "$video-journal:rough-cut 포켓 3 원본으로 편집 초안과 한글 자막 만들어줘"
     ]
   }
 }
